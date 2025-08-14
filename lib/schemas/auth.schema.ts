@@ -33,10 +33,8 @@ export const registerSchema = z.object({
   phoneCode: z.string().default('+62'),
   phoneNumber: z
     .string()
-    .min(10, 'Nomor telepon minimal 10 digit')
-    .max(15, 'Nomor telepon maksimal 15 digit')
-    .regex(/^\d+$/, 'Nomor telepon hanya boleh berisi angka'),
-  country: z.string().min(1, 'Negara wajib dipilih'),
+    .optional(),
+  country: z.string().optional(),
   mailAddress: z
     .string()
     .min(3, 'Alamat email minimal 3 karakter')

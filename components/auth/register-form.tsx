@@ -13,12 +13,12 @@ const registerSchema = z.object({
   firstName: z.string().min(1, 'First Name harus diisi'),
   lastName: z.string().min(1, 'Last Name harus diisi'),
   phoneCode: z.string().default('+62'),
-  phoneNumber: z.string().min(1, 'Phone Number harus diisi'),
-  country: z.string().min(1, 'Country harus dipilih'),
+  phoneNumber: z.string().optional(), // Optional karena tidak dikirim ke API
+  country: z.string().optional(), // Optional karena tidak dikirim ke API
   mailAddress: z.string().min(1, 'Mail Address harus diisi'),
   password: z.string().min(6, 'Password minimal 6 karakter'),
   confirmPassword: z.string().min(1, 'Confirm Password harus diisi'),
-  about: z.string().optional()
+  about: z.string().optional() // Optional karena tidak dikirim ke API
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Password tidak sama",
   path: ["confirmPassword"],
@@ -90,6 +90,8 @@ export function RegisterForm() {
   const phoneCodeValue = watch('phoneCode')
 
   const onSubmit = async (data: RegisterFormData) => {
+    // Pengguna dapat mengisi semua field, namun API hanya membutuhkan firstName, lastName, email, dan password
+    // Field phoneNumber, country, dan about akan diabaikan oleh API
     await registerMutation.mutateAsync(data)
   }
 
@@ -201,12 +203,16 @@ export function RegisterForm() {
                 {...register('phoneNumber')}
                 onFocus={() => setPhoneNumberFocused(true)}
                 onBlur={() => setPhoneNumberFocused(false)}
-                disabled
                 className={`
                   w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-gray-100 cursor-not-allowed
+                  border-2 rounded-lg bg-white
                   focus:outline-none focus:ring-0
-                  border-gray-200
+                  ${errors.phoneNumber 
+                    ? 'border-red-400 focus:border-red-500' 
+                    : phoneNumberFocused 
+                      ? 'border-blue-500' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }
                 `}
                 placeholder=""
               />
@@ -221,7 +227,7 @@ export function RegisterForm() {
                   }
                 `}
               >
-                Phone Number
+                Phone Number (Optional)
               </label>
               {errors.phoneNumber && (
                 <p className="mt-1 text-xs text-red-500">{errors.phoneNumber.message}</p>
@@ -235,12 +241,16 @@ export function RegisterForm() {
                 {...register('country')}
                 onFocus={() => setCountryFocused(true)}
                 onBlur={() => setCountryFocused(false)}
-                disabled
                 className={`
                   w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-gray-100 appearance-none cursor-not-allowed
+                  border-2 rounded-lg bg-white appearance-none
                   focus:outline-none focus:ring-0
-                  border-gray-200
+                  ${errors.country 
+                    ? 'border-red-400 focus:border-red-500' 
+                    : countryFocused 
+                      ? 'border-blue-500' 
+                      : 'border-gray-300 hover:border-gray-400'
+                  }
                 `}
               >
                 <option value="">Select</option>
@@ -261,7 +271,7 @@ export function RegisterForm() {
                   }
                 `}
               >
-                Country
+                Country (Optional)
               </label>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               {errors.country && (
@@ -424,13 +434,15 @@ export function RegisterForm() {
               {...register('about')}
               onFocus={() => setAboutFocused(true)}
               onBlur={() => setAboutFocused(false)}
-              disabled
               rows={4}
               className={`
                 w-full px-3 py-3 text-sm transition-all duration-200 
-                border-2 rounded-lg bg-gray-100 resize-none cursor-not-allowed
+                border-2 rounded-lg bg-white resize-none
                 focus:outline-none focus:ring-0
-                border-gray-200
+                ${aboutFocused 
+                  ? 'border-blue-500' 
+                  : 'border-gray-300 hover:border-gray-400'
+                }
               `}
               placeholder=""
             />
