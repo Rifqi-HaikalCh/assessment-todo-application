@@ -22,11 +22,11 @@ export default function RegisterPage() {
       </div>
 
       {/* Register Card */}
-      <main className="w-full max-w-md -mt-40 bg-white rounded-xl p-8 shadow-lg z-10">
+      <main className="w-full max-w-4xl -mt-40 bg-white rounded-xl p-12 shadow-2xl z-10">
         <h1 className="text-3xl font-extrabold text-gray-800 text-center mb-2">
           Register
         </h1>
-        <p className="text-center text-gray-500 text-xs mb-8">
+        <p className="text-center text-gray-500 text-xs mb-8 font-roboto">
           Let's Sign up first for enter into Square Website. Uh She Up!
         </p>
 
@@ -35,7 +35,7 @@ export default function RegisterPage() {
 
       {/* Bottom spacing */}
       <div className="py-8">
-        <Link href="/login" className="text-blue-600 text-sm hover:text-blue-700">
+        <Link href="/login" className="text-blue-600 text-sm hover:text-blue-700 font-roboto">
           Already have an account? Sign in
         </Link>
       </div>
