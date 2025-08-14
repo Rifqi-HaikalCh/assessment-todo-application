@@ -11,8 +11,19 @@ export function middleware(request: NextRequest) {
   // Ambil token dari cookie atau header
   const token = request.cookies.get('auth-token')?.value
   
+  // Handle root path redirect
+  if (pathname === '/') {
+    const url = request.nextUrl.clone()
+    if (token) {
+      url.pathname = '/todo'
+    } else {
+      url.pathname = '/login'
+    }
+    return NextResponse.redirect(url)
+  }
+  
   // Daftar route publik (tidak perlu auth)
-  const publicRoutes = ['/login', '/register', '/']
+  const publicRoutes = ['/login', '/register']
   
   // Daftar route yang memerlukan auth
   const protectedRoutes = ['/todo', '/admin']
