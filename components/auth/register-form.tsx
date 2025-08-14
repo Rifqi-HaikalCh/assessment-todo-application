@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
+import { useRegister } from '@/lib/hooks/use-auth'
 
 // Schema validation untuk register form
 const registerSchema = z.object({
@@ -44,6 +45,7 @@ const phoneCodes = [
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const registerMutation = useRegister()
   
   // Focus states untuk floating labels
   const [firstNameFocused, setFirstNameFocused] = useState(false)
@@ -88,8 +90,7 @@ export function RegisterForm() {
   const phoneCodeValue = watch('phoneCode')
 
   const onSubmit = async (data: RegisterFormData) => {
-    console.log('Register data:', data)
-    // Implementasi register logic disini
+    await registerMutation.mutateAsync(data)
   }
 
   return (
@@ -200,16 +201,12 @@ export function RegisterForm() {
                 {...register('phoneNumber')}
                 onFocus={() => setPhoneNumberFocused(true)}
                 onBlur={() => setPhoneNumberFocused(false)}
+                disabled
                 className={`
                   w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
+                  border-2 rounded-lg bg-gray-100 cursor-not-allowed
                   focus:outline-none focus:ring-0
-                  ${errors.phoneNumber 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : phoneNumberFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
+                  border-gray-200
                 `}
                 placeholder=""
               />
@@ -238,16 +235,12 @@ export function RegisterForm() {
                 {...register('country')}
                 onFocus={() => setCountryFocused(true)}
                 onBlur={() => setCountryFocused(false)}
+                disabled
                 className={`
                   w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white appearance-none
+                  border-2 rounded-lg bg-gray-100 appearance-none cursor-not-allowed
                   focus:outline-none focus:ring-0
-                  ${errors.country 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : countryFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
+                  border-gray-200
                 `}
               >
                 <option value="">Select</option>
@@ -431,15 +424,13 @@ export function RegisterForm() {
               {...register('about')}
               onFocus={() => setAboutFocused(true)}
               onBlur={() => setAboutFocused(false)}
+              disabled
               rows={4}
               className={`
                 w-full px-3 py-3 text-sm transition-all duration-200 
-                border-2 rounded-lg bg-white resize-none
+                border-2 rounded-lg bg-gray-100 resize-none cursor-not-allowed
                 focus:outline-none focus:ring-0
-                ${aboutFocused 
-                  ? 'border-blue-500' 
-                  : 'border-gray-300 hover:border-gray-400'
-                }
+                border-gray-200
               `}
               placeholder=""
             />
@@ -467,19 +458,18 @@ export function RegisterForm() {
               Login
             </Link>
             <button
-              type="button"
-              onClick={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
+              type="submit"
+              disabled={isSubmitting || registerMutation.isPending}
               className={`
                 flex-1 py-3 text-white font-poppins font-semibold rounded-lg
                 transition-all duration-200 
-                ${isSubmitting 
+                ${isSubmitting || registerMutation.isPending
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-[#0066ff] hover:bg-[#0051cc] active:bg-[#003d99] hover:shadow-lg'
                 }
               `}
             >
-              {isSubmitting ? 'Loading...' : 'Register'}
+              {isSubmitting || registerMutation.isPending ? 'Loading...' : 'Register'}
             </button>
           </div>
     </form>

@@ -19,29 +19,55 @@ export async function login(data: LoginInput): Promise<LoginResponse> {
     password: data.password,
   })
   
-  // Validasi response dengan zod
-  return loginResponseSchema.parse(response.data)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    success: true,
+    message: apiResponse.message || 'Successfully Logged In!',
+    data: {
+      user: {
+        id: apiResponse.content.user.id,
+        name: apiResponse.content.user.fullName,
+        email: apiResponse.content.user.email,
+        role: apiResponse.content.user.role.toLowerCase() === 'admin' ? 'admin' : 'user'
+      },
+      token: apiResponse.content.token
+    }
+  }
+  
+  return loginResponseSchema.parse(transformedResponse)
 }
 
 /**
  * API untuk register
  */
 export async function register(data: RegisterInput): Promise<RegisterResponse> {
-  // Format data untuk API
+  // Format data untuk API, only send required fields based on API spec
   const payload = {
-    firstName: data.firstName,
-    lastName: data.lastName,
+    fullName: `${data.firstName} ${data.lastName}`,
     email: `${data.mailAddress}@squareteam.com`,
-    phone: `${data.phoneCode}${data.phoneNumber}`,
-    country: data.country,
     password: data.password,
-    about: data.about,
   }
   
   const response = await apiClient.post('/register', payload)
   
-  // Validasi response dengan zod
-  return registerResponseSchema.parse(response.data)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    success: true,
+    message: apiResponse.message || 'Successfully Registered!',
+    data: {
+      user: {
+        id: apiResponse.content.user.id,
+        name: apiResponse.content.user.fullName,
+        email: apiResponse.content.user.email,
+        role: apiResponse.content.user.role.toLowerCase() === 'admin' ? 'admin' : 'user'
+      },
+      token: apiResponse.content.token
+    }
+  }
+  
+  return registerResponseSchema.parse(transformedResponse)
 }
 
 /**
@@ -50,8 +76,20 @@ export async function register(data: RegisterInput): Promise<RegisterResponse> {
 export async function verifyToken(): Promise<TokenResponse> {
   const response = await apiClient.get('/verify-token')
   
-  // Validasi response dengan zod
-  return tokenResponseSchema.parse(response.data)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    valid: true,
+    message: apiResponse.message || 'Token is valid',
+    user: {
+      id: apiResponse.content.user.id,
+      name: apiResponse.content.user.fullName,
+      email: apiResponse.content.user.email,
+      role: apiResponse.content.user.role.toLowerCase() === 'admin' ? 'admin' : 'user'
+    }
+  }
+  
+  return tokenResponseSchema.parse(transformedResponse)
 }
 
 /**

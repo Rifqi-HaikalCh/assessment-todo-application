@@ -18,7 +18,8 @@ export function TodoItem({ todo, onSelect, isSelected }: TodoItemProps) {
   const deleteMutation = useDeleteTodo()
 
   const handleToggle = () => {
-    toggleMutation.mutate(todo.id)
+    const action = todo.completed ? 'UNDONE' : 'DONE'
+    toggleMutation.mutate({ id: todo.id, action })
   }
 
   const handleDelete = () => {

@@ -70,7 +70,7 @@ export const loginResponseSchema = z.object({
       id: z.string(),
       name: z.string(),
       email: z.string(),
-      role: z.enum(['user', 'admin']).optional(),
+      role: z.enum(['user', 'admin']),
     }),
   }).optional(),
 })
@@ -82,8 +82,13 @@ export const registerResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
   data: z.object({
-    id: z.string(),
-    email: z.string(),
+    token: z.string(),
+    user: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+      role: z.enum(['user', 'admin']),
+    }),
   }).optional(),
 })
 
@@ -96,7 +101,7 @@ export const tokenResponseSchema = z.object({
     id: z.string(),
     name: z.string(),
     email: z.string(),
-    role: z.enum(['user', 'admin']).optional(),
+    role: z.enum(['user', 'admin']),
   }).optional(),
 })
 

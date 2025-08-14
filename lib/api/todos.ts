@@ -15,26 +15,23 @@ import {
  * API untuk mengambil semua todos
  */
 export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
-  const params = new URLSearchParams()
+  const response = await apiClient.get('/todos')
   
-  if (filter) {
-    if (filter.status && filter.status !== 'all') {
-      params.append('status', filter.status)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    success: true,
+    message: 'Todos retrieved successfully',
+    data: apiResponse || [],
+    pagination: {
+      total: apiResponse?.length || 0,
+      page: 1,
+      limit: 20,
+      totalPages: 1
     }
-    if (filter.search) {
-      params.append('search', filter.search)
-    }
-    if (filter.userId) {
-      params.append('userId', filter.userId)
-    }
-    params.append('page', filter.page.toString())
-    params.append('limit', filter.limit.toString())
   }
   
-  const response = await apiClient.get('/todos', { params })
-  
-  // Validasi response dengan zod
-  return todoListResponseSchema.parse(response.data)
+  return todoListResponseSchema.parse(transformedResponse)
 }
 
 /**
@@ -51,10 +48,19 @@ export async function getTodo(id: string): Promise<TodoResponse> {
  * API untuk membuat todo baru
  */
 export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
-  const response = await apiClient.post('/todos', data)
+  const response = await apiClient.post('/todos', {
+    item: data.title
+  })
   
-  // Validasi response dengan zod
-  return todoResponseSchema.parse(response.data)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    success: true,
+    message: 'Todo created successfully',
+    data: apiResponse
+  }
+  
+  return todoResponseSchema.parse(transformedResponse)
 }
 
 /**
@@ -73,11 +79,20 @@ export async function updateTodo(
 /**
  * API untuk toggle status todo (mark as complete/incomplete)
  */
-export async function toggleTodo(id: string): Promise<TodoResponse> {
-  const response = await apiClient.post(`/todos/${id}/mark`)
+export async function toggleTodo(id: string, action: 'DONE' | 'UNDONE' = 'DONE'): Promise<TodoResponse> {
+  const response = await apiClient.put(`/todos/${id}/mark`, {
+    action
+  })
   
-  // Validasi response dengan zod
-  return todoResponseSchema.parse(response.data)
+  // Transform API response to match our schema
+  const apiResponse = response.data
+  const transformedResponse = {
+    success: true,
+    message: 'Todo status updated successfully',
+    data: apiResponse
+  }
+  
+  return todoResponseSchema.parse(transformedResponse)
 }
 
 /**

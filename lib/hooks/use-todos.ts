@@ -95,14 +95,14 @@ export function useToggleTodo() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: (id: string) => toggleTodo(id),
-    onSuccess: (response, id) => {
+    mutationFn: ({ id, action }: { id: string; action: 'DONE' | 'UNDONE' }) => toggleTodo(id, action),
+    onSuccess: (response, variables) => {
       if (response.success) {
         // Invalidate queries
-        queryClient.invalidateQueries({ queryKey: ['todo', id] })
+        queryClient.invalidateQueries({ queryKey: ['todo', variables.id] })
         queryClient.invalidateQueries({ queryKey: ['todos'] })
         
-        const status = response.data.completed ? 'selesai' : 'belum selesai'
+        const status = variables.action === 'DONE' ? 'selesai' : 'belum selesai'
         toast.success(`Todo ditandai ${status}`)
       } else {
         toast.error(response.message || 'Gagal mengubah status todo')
