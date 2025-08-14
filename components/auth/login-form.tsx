@@ -60,7 +60,7 @@ export function LoginForm() {
               ? "border-red-400 focus:ring-red-400" 
               : "border-blue-400 focus:ring-blue-400"
           )}
-          placeholder="soeraji@squareteam.com"
+          placeholder="enter your email"
         />
         {errors.email && (
           <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
@@ -89,7 +89,7 @@ export function LoginForm() {
                 ? "border-red-400 focus:ring-red-400" 
                 : "border-red-400 focus:ring-red-400"
             )}
-            placeholder="••••••••••"
+            placeholder="enter your password"
           />
           <button
             type="button"
@@ -134,6 +134,19 @@ export function LoginForm() {
       >
         {isSubmitting || loginMutation.isPending ? 'Loading...' : 'Login'}
       </Button>
+      
+      {/* Registration Link */}
+      <div className="text-center mt-6">
+        <p className="text-gray-600 text-sm">
+          Already have a Square account?{' '}
+          <Link
+            href="/register"
+            className="text-blue-500 font-semibold hover:text-blue-600"
+          >
+            Register
+          </Link>
+        </p>
+      </div>
     </form>
   )
 }
