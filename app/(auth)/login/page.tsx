@@ -8,14 +8,14 @@ export default function LoginPage() {
       <div className="flex-grow relative">
         {/* Header */}
         <div className="max-w-3xl mx-auto px-6 pt-20 text-center">
-          <h1 className="text-4xl font-extrabold text-gray-800">Sign In</h1>
+          <h1 className="text-4xl font-extrabold text-gray-800">Log In</h1>
           <p className="mt-3 text-gray-500 text-sm">
             Just sign in if you have an account in here. Enjoy our Website
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="max-w-xl mx-auto mt-10 bg-white rounded-2xl p-8 shadow-sm relative z-10">
+        <div className="max-w-xl mx-auto mt-10 bg-white rounded-2xl p-8 shadow-2xl relative z-10">
           <LoginForm />
         </div>
       </div>
