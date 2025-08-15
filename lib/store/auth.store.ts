@@ -27,6 +27,7 @@ interface AuthState {
   login: (user: User, token: string) => void
   logout: () => void
   checkAuth: () => boolean
+  syncTokenToCookie: () => void
 }
 
 /**
@@ -55,6 +56,11 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           isLoading: false,
         })
+        
+        // Simpan token ke cookies untuk middleware
+        if (typeof window !== 'undefined') {
+          document.cookie = `auth-token=${token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`
+        }
       },
       
       logout: () => {
@@ -66,8 +72,9 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
         })
         
-        // Redirect ke halaman login
+        // Hapus token dari cookies
         if (typeof window !== 'undefined') {
+          document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
           window.location.href = '/login'
         }
       },
@@ -75,6 +82,13 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: () => {
         const state = get()
         return !!state.token && !!state.user
+      },
+      
+      syncTokenToCookie: () => {
+        const state = get()
+        if (state.token && typeof window !== 'undefined') {
+          document.cookie = `auth-token=${state.token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`
+        }
       },
     }),
     {

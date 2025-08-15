@@ -2,7 +2,19 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '@/lib/store/auth.store'
+
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const syncTokenToCookie = useAuthStore((state) => state.syncTokenToCookie)
+  
+  useEffect(() => {
+    // Sync token to cookie on app initialization
+    syncTokenToCookie()
+  }, [syncTokenToCookie])
+  
+  return <>{children}</>
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Membuat QueryClient instance dengan konfigurasi default
@@ -27,7 +39,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
       {/* React Query Devtools hanya muncul di development */}
       {process.env.NODE_ENV === 'development' && (
         <ReactQueryDevtools initialIsOpen={false} />
