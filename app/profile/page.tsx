@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, User, Mail, Shield, Calendar, LogOut } from 'lucide-react'
+import { ArrowLeft, User, Mail, Shield, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCurrentUser, useLogout } from '@/lib/hooks/use-auth'
@@ -27,16 +27,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#dedede] flex flex-col font-inter">
-      {/* Top Section */}
-      <div className="relative bg-white flex justify-center pt-16 pb-20 px-6">
-        <div className="absolute top-0 left-0 w-20 h-20 rounded-bl-3xl bg-white" 
-          style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
-        />
-        <h1 className="text-3xl font-extrabold text-[#1e3a8a] z-10">Profile</h1>
-      </div>
-
       {/* Main Content */}
-      <main className="flex justify-center -mt-12 px-6 pb-20">
+      <main className="flex justify-center pt-20 px-6 pb-20">
         <section 
           className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-8"
           style={{ boxShadow: "10px 10px 20px rgba(0,0,0,0.1)" }}
@@ -44,11 +36,11 @@ export default function ProfilePage() {
           {/* Back Button */}
           <div className="mb-6">
             <Link
-              href="/todo"
+              href={user.role === 'admin' ? '/admin' : '/todo'}
               className="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke To-Do
+              {user.role === 'admin' ? 'Kembali ke Admin' : 'Kembali ke To-Do'}
             </Link>
           </div>
 
@@ -112,28 +104,17 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">User ID</p>
-                  <p className="font-semibold text-gray-800 font-mono text-sm">{user.id}</p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/todo" className="flex-1">
+            <Link href={user.role === 'admin' ? '/admin' : '/todo'} className="flex-1">
               <Button 
                 variant="outline" 
                 className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Kembali ke To-Do
+                {user.role === 'admin' ? 'Kembali ke Admin' : 'Kembali ke To-Do'}
               </Button>
             </Link>
             
