@@ -1,4 +1,4 @@
-// app/(dashboard)/admin/layout.tsx
+// src/app/(dashboard)/admin/layout.tsx
 'use client'
 
 import React from 'react'
@@ -9,7 +9,7 @@ import { AdminHeader } from '@/components/admin/header'
 
 /**
  * Layout untuk halaman admin
- * Mengecek authorization dan menampilkan sidebar + header
+ * Mengikuti struktur HTML template yang diberikan
  */
 export default function AdminLayout({
   children,
@@ -35,7 +35,7 @@ export default function AdminLayout({
   // Jika belum ada user data, tampilkan loading
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f7f8fa]">
         <div className="text-gray-500">Loading...</div>
       </div>
     )
@@ -47,21 +47,19 @@ export default function AdminLayout({
   }
   
   return (
-    <div className="min-h-screen bg-[#f8f9fb] text-[#4b5563]">
+    <div className="bg-[#f7f8fa] text-[#4b5563] min-h-screen">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
+        {/* Sidebar - sesuai HTML template */}
         <AdminSidebar />
         
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
+        {/* Main content - sesuai HTML template */}
+        <main className="flex-1 flex flex-col">
+          {/* Header - sesuai HTML template */}
           <AdminHeader />
           
           {/* Page Content */}
-          <main className="flex-1">
-            {children}
-          </main>
-        </div>
+          {children}
+        </main>
       </div>
     </div>
   )

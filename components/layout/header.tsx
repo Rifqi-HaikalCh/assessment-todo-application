@@ -75,7 +75,7 @@ export function Header({ showSearch = false }: HeaderProps) {
 
       {/* User Info dengan Dropdown */}
       <div className="flex items-center space-x-3 text-gray-900 text-sm font-normal">
-        <span>{user?.name || 'Ahmad Akbar'}</span>
+        <span>{user?.name || 'User'}</span>
         <div className="relative" ref={dropdownRef}>
           {/* Avatar dengan Dropdown Trigger */}
           <button
@@ -85,7 +85,7 @@ export function Header({ showSearch = false }: HeaderProps) {
             <div className="relative">
               {/* Avatar */}
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600">
-                {getInitials(user?.name || 'Ahmad Akbar')}
+                {getInitials(user?.name || 'User')}
               </div>
               {/* Online Status */}
               <span

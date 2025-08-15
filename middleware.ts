@@ -1,8 +1,9 @@
+// src/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 /**
- * Middleware untuk proteksi route
+ * Middleware untuk proteksi route dengan logika admin yang diperbaiki
  * Mengecek token dan redirect sesuai kondisi
  */
 export function middleware(request: NextRequest) {
@@ -15,6 +16,7 @@ export function middleware(request: NextRequest) {
   if (pathname === '/') {
     const url = request.nextUrl.clone()
     if (token) {
+      // Redirect ke todo sebagai default, nanti akan diperiksa role di component level
       url.pathname = '/todo'
     } else {
       url.pathname = '/login'
@@ -26,7 +28,7 @@ export function middleware(request: NextRequest) {
   const publicRoutes = ['/login', '/register']
   
   // Daftar route yang memerlukan auth
-  const protectedRoutes = ['/todo', '/admin']
+  const protectedRoutes = ['/todo', '/admin', '/profile']
   
   // Daftar route khusus admin
   const adminRoutes = ['/admin']
@@ -55,9 +57,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
   
-  // Untuk admin route, perlu validasi role (ini simplified, idealnya decode JWT)
-  // Karena kita tidak bisa decode JWT di middleware tanpa secret key,
-  // validasi role akan dilakukan di component level
+  // PERBAIKAN: Logika untuk admin route
+  // Validasi role akan dilakukan di component level karena kita tidak bisa decode JWT di middleware
+  // Tapi kita bisa menambahkan header untuk memberikan info bahwa ini admin route
+  if (isAdminRoute) {
+    const response = NextResponse.next()
+    response.headers.set('x-admin-route', 'true')
+    return response
+  }
+  
+  // PERBAIKAN: Logika untuk todo route
+  // Jika user mengakses /todo, kita akan biarkan component yang menentukan redirect
+  // berdasarkan role (admin akan diredirect ke /admin, user biasa tetap di /todo)
+  if (pathname.startsWith('/todo')) {
+    const response = NextResponse.next()
+    response.headers.set('x-user-route', 'true')
+    return response
+  }
   
   return NextResponse.next()
 }
