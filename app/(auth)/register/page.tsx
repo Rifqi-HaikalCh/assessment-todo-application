@@ -27,7 +27,7 @@ export default function RegisterPage() {
           Register
         </h1>
         <p className="text-center text-gray-500 text-xs mb-8 font-roboto">
-          Let's Sign up first for enter into Square Website. Uh She Up!
+          Let's Sign up first for enter into Nodewave Website. Uh She Up!
         </p>
 
         <RegisterForm />
