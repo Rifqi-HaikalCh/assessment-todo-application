@@ -23,13 +23,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Footer Link - Responsive */}
-      <div className="max-w-3xl mx-auto px-4 lg:px-6 py-4 lg:py-6 text-center text-blue-600 font-semibold text-sm">
-        <Link href="/register" className="hover:text-blue-700 transition-colors">
-          Don't have a Nodewave account? Sign up
-        </Link>
-      </div>
-      
       {/* Footer */}
       <Footer />
 

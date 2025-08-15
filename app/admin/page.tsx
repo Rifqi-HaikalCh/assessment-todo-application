@@ -50,9 +50,15 @@ export default function AdminPage() {
     
     if (filter.search) {
       const searchLower = filter.search.toLowerCase()
-      todos = todos.filter(todo => 
-        todo.item.toLowerCase().includes(searchLower)
-      )
+      todos = todos.filter(todo => {
+        const todoText = todo.item.toLowerCase()
+        const userName = formatUserName(todo).toLowerCase()
+        const status = todo.isDone ? 'success' : 'pending'
+        
+        return todoText.includes(searchLower) || 
+               userName.includes(searchLower) || 
+               status.includes(searchLower)
+      })
     }
     
     return todos
@@ -251,15 +257,15 @@ export default function AdminPage() {
             <section className="flex-1 px-4 lg:px-8 py-4 lg:py-6">
               <div className="bg-white rounded-lg p-4 lg:p-6 shadow-sm">
                 {/* Search and Filter - Responsive */}
-                <form onSubmit={handleSearch} className="space-y-4 lg:space-y-0 lg:flex lg:items-center lg:gap-4 mb-6">
+                <form onSubmit={handleSearch} className="space-y-4 lg:space-y-0 lg:flex lg:items-center lg:gap-3 mb-6">
                   <label className="sr-only" htmlFor="search">Search</label>
                   
                   {/* Search Input */}
-                  <div className="relative flex-1 lg:max-w-xs">
+                  <div className="relative flex-1 lg:max-w-md">
                     <input 
-                      className="w-full border border-gray-200 rounded-md py-2 pl-9 pr-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600" 
+                      className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" 
                       id="search"
-                      placeholder="Search todos..." 
+                      placeholder="Search by name, todo, or status..." 
                       type="search"
                       value={searchValue}
                       onChange={(e) => setSearchValue(e.target.value)}
@@ -268,9 +274,9 @@ export default function AdminPage() {
                   </div>
 
                   {/* Buttons Container */}
-                  <div className="flex flex-col sm:flex-row gap-2 lg:gap-4 lg:ml-auto">
+                  <div className="flex flex-row gap-2 lg:gap-3">
                     <button 
-                      className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors" 
+                      className="bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all shadow-sm" 
                       type="submit"
                     >
                       Search
@@ -281,7 +287,7 @@ export default function AdminPage() {
                       <select
                         value={filter.status}
                         onChange={handleStatusFilter}
-                        className="appearance-none bg-white border border-gray-200 rounded-md px-3 py-2 pr-8 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 cursor-pointer"
+                        className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition-all shadow-sm"
                       >
                         <option value="all">All Status</option>
                         <option value="success">Success</option>
@@ -293,48 +299,73 @@ export default function AdminPage() {
                 </form>
 
                 {/* Table Container with Horizontal Scroll */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-gray-700 text-sm border-collapse min-w-[500px]">
-                    <thead className="bg-[#fafafa] border-b border-gray-200">
+                <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <table className="w-full text-left text-gray-700 text-sm min-w-[500px]">
+                    <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                       <tr>
-                        <th className="font-semibold py-3 px-2 lg:px-4 text-xs lg:text-sm">Name</th>
-                        <th className="font-semibold py-3 px-2 lg:px-4 text-xs lg:text-sm">To do</th>
-                        <th className="font-semibold py-3 px-2 lg:px-4 text-xs lg:text-sm text-center">Status</th>
+                        <th className="font-semibold py-4 px-4 lg:px-6 text-xs lg:text-sm text-gray-800 tracking-wide uppercase">Name</th>
+                        <th className="font-semibold py-4 px-4 lg:px-6 text-xs lg:text-sm text-gray-800 tracking-wide uppercase">To do</th>
+                        <th className="font-semibold py-4 px-4 lg:px-6 text-xs lg:text-sm text-center text-gray-800 tracking-wide uppercase">Status</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                       {isLoading ? (
-                        <tr>
-                          <td colSpan={3} className="py-8 text-center text-gray-500">
-                            Loading...
+                        <tr className="bg-gray-50/50">
+                          <td colSpan={3} className="py-12 text-center text-gray-500">
+                            <div className="flex items-center justify-center space-x-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                              <span>Loading...</span>
+                            </div>
                           </td>
                         </tr>
                       ) : paginatedTodos.length === 0 ? (
-                        <tr>
-                          <td colSpan={3} className="py-8 text-center text-gray-500">
-                            Tidak ada data
+                        <tr className="bg-gray-50/50">
+                          <td colSpan={3} className="py-12 text-center text-gray-500">
+                            <div className="flex flex-col items-center space-y-2">
+                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <span>Tidak ada data</span>
+                            </div>
                           </td>
                         </tr>
                       ) : (
-                        paginatedTodos.map((todo) => (
-                          <tr key={todo.id} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="py-3 px-2 lg:px-4">
-                              <div className="font-medium text-gray-900 truncate max-w-[100px] lg:max-w-none">
-                                {formatUserName(todo)}
+                        paginatedTodos.map((todo, index) => (
+                          <tr 
+                            key={todo.id} 
+                            className={cn(
+                              "transition-all duration-200 ease-in-out",
+                              "hover:bg-blue-50/70 hover:shadow-sm hover:scale-[1.001]",
+                              "group cursor-pointer",
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                            )}
+                          >
+                            <td className="py-4 px-4 lg:px-6">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
+                                  {formatUserName(todo).charAt(0).toUpperCase()}
+                                </div>
+                                <div className="font-medium text-gray-900 group-hover:text-blue-800 transition-colors truncate max-w-[120px] lg:max-w-none">
+                                  {formatUserName(todo)}
+                                </div>
                               </div>
                             </td>
-                            <td className="py-3 px-2 lg:px-4">
-                              <div className="text-gray-700 break-words max-w-[200px] lg:max-w-none">
+                            <td className="py-4 px-4 lg:px-6">
+                              <div className="text-gray-700 group-hover:text-gray-900 transition-colors break-words max-w-[200px] lg:max-w-none leading-relaxed">
                                 {todo.item}
                               </div>
                             </td>
-                            <td className="py-3 px-2 lg:px-4 text-center">
+                            <td className="py-4 px-4 lg:px-6 text-center">
                               <span className={cn(
-                                "inline-block text-white text-xs font-semibold rounded-full px-2 lg:px-3 py-1 select-none",
+                                "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all shadow-sm",
                                 todo.isDone 
-                                  ? "bg-green-400" 
-                                  : "bg-red-500"
+                                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200 group-hover:bg-emerald-200" 
+                                  : "bg-amber-100 text-amber-800 border border-amber-200 group-hover:bg-amber-200"
                               )}>
+                                <div className={cn(
+                                  "w-1.5 h-1.5 rounded-full mr-1.5",
+                                  todo.isDone ? "bg-emerald-500" : "bg-amber-500"
+                                )}></div>
                                 {todo.isDone ? 'Success' : 'Pending'}
                               </span>
                             </td>
