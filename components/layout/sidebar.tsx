@@ -11,7 +11,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const isAdmin = useIsAdmin()
   const logout = useLogout()
-  const { isCollapsed, toggleSidebar } = useSidebarStore()
+  const { isCollapsed, toggleSidebar, setSidebarCollapsed } = useSidebarStore()
 
   const menuItems = [
     {
@@ -29,12 +29,24 @@ export function Sidebar() {
   ]
 
   return (
-    <aside 
-      className={cn(
-        "flex flex-col bg-white border-r border-gray-200 min-h-screen transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-16" : "w-56"
+    <>
+      {/* Mobile overlay */}
+      {!isCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarCollapsed(true)}
+        />
       )}
-    >
+      
+      <aside 
+        className={cn(
+          "flex flex-col bg-white border-r border-gray-200 min-h-screen transition-all duration-300 ease-in-out z-50",
+          "fixed lg:relative inset-y-0 left-0",
+          isCollapsed 
+            ? "-translate-x-full lg:translate-x-0 lg:w-16" 
+            : "translate-x-0 w-64 lg:w-56"
+        )}
+      >
       {/* Header dengan Logo dan Toggle */}
       <div className={cn(
         "flex items-center border-b border-gray-200 py-6",
@@ -117,6 +129,7 @@ export function Sidebar() {
           )}
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }

@@ -27,10 +27,10 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#dedede] flex flex-col font-inter">
-      {/* Main Content */}
-      <main className="flex justify-center pt-20 px-6 pb-20">
+      {/* Main Content - Responsive */}
+      <main className="flex justify-center pt-12 lg:pt-20 px-4 lg:px-6 pb-12 lg:pb-20">
         <section 
-          className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-8"
+          className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 lg:p-8"
           style={{ boxShadow: "10px 10px 20px rgba(0,0,0,0.1)" }}
         >
           {/* Back Button */}
@@ -44,24 +44,24 @@ export default function ProfilePage() {
             </Link>
           </div>
 
-          {/* Profile Card */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 mb-6">
-            <div className="flex items-center space-x-4 mb-4">
+          {/* Profile Card - Responsive */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-4 lg:p-6 mb-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
               {/* Avatar */}
-              <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold">
+              <div className="relative flex-shrink-0">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl lg:text-2xl font-bold">
                   {getInitials(user.name)}
                 </div>
                 <span
                   aria-label="Online status"
-                  className="absolute bottom-0 right-0 block w-4 h-4 rounded-full ring-2 ring-white bg-green-500"
+                  className="absolute bottom-0 right-0 block w-4 h-4 lg:w-5 lg:h-5 rounded-full ring-2 ring-white bg-green-500"
                 />
               </div>
               
               {/* User Info */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">{user.name}</h2>
-                <p className="text-gray-600 capitalize">{user.role} Account</p>
+              <div className="flex-1">
+                <h2 className="text-xl lg:text-2xl font-bold text-gray-800">{user.name}</h2>
+                <p className="text-gray-600 capitalize text-sm lg:text-base">{user.role} Account</p>
               </div>
             </div>
           </div>

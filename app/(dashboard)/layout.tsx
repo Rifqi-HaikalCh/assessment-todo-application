@@ -20,13 +20,14 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-300 ease-in-out",
-        isCollapsed ? "ml-0" : "ml-0" // Let sidebar handle its own width
+        "lg:ml-0", // Desktop: no margin needed
+        isCollapsed ? "ml-0" : "ml-0" // Mobile: always full width, sidebar is overlay
       )}>
         {/* Header */}
         <Header showSearch />
         
         {/* Page Content */}
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           {children}
         </div>
       </div>

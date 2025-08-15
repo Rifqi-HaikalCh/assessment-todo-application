@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Search, Star, ChevronDown, User, LogOut } from 'lucide-react'
 import { useCurrentUser } from '@/lib/hooks/use-auth'
 import { useSearchStore } from '@/lib/store/search.store'
+import { useSidebarStore } from '@/lib/store/sidebar.store'
 import { useLogout } from '@/lib/hooks/use-auth'
 import { getInitials } from '@/lib/utils'
 import Link from 'next/link'
@@ -16,6 +17,7 @@ export function Header({ showSearch = false }: HeaderProps) {
   const user = useCurrentUser()
   const logout = useLogout()
   const { searchQuery, setSearchQuery } = useSearchStore()
+  const { isCollapsed, toggleSidebar } = useSidebarStore()
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -50,11 +52,22 @@ export function Header({ showSearch = false }: HeaderProps) {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200">
+    <header className="flex items-center justify-between px-4 lg:px-6 py-3 bg-white border-b border-gray-200">
+      {/* Mobile menu button */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden p-2 text-gray-500 hover:text-gray-700"
+        aria-label="Toggle menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
       {/* Search atau Star */}
       {showSearch ? (
-        <div className="flex items-center space-x-2 text-gray-400 text-sm max-w-md flex-1">
-          <div className="relative flex-1">
+        <div className="hidden sm:flex items-center space-x-2 text-gray-400 text-sm max-w-md flex-1 lg:ml-0">
+          <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               id="header-search"
@@ -74,8 +87,8 @@ export function Header({ showSearch = false }: HeaderProps) {
       )}
 
       {/* User Info dengan Dropdown */}
-      <div className="flex items-center space-x-3 text-gray-900 text-sm font-normal">
-        <span>{user?.name || 'User'}</span>
+      <div className="flex items-center space-x-2 lg:space-x-3 text-gray-900 text-sm font-normal">
+        <span className="hidden sm:block">{user?.name || 'User'}</span>
         <div className="relative" ref={dropdownRef}>
           {/* Avatar dengan Dropdown Trigger */}
           <button

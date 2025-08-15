@@ -30,16 +30,38 @@ export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
     todosArray = apiResponse
   }
   
-  // Transform todos to match our schema
-  const transformedTodos = todosArray.map((todo: any) => ({
-    id: todo.id || todo._id || Math.random().toString(36).substr(2, 9),
-    title: todo.item || todo.title || 'Todo Item',
-    completed: todo.isDone || todo.completed || false,
-    userId: todo.userId || 'current-user',
-    userName: todo.userName || todo.userFullName || 'Current User',
-    createdAt: todo.createdAt || new Date().toISOString(),
-    updatedAt: todo.updatedAt || new Date().toISOString(),
-  }))
+  // Transform todos to match our schema - HANYA data yang valid dari API
+  const transformedTodos = todosArray
+    .filter((todo: any) => {
+      // HANYA terima todo yang memiliki ID dan title yang valid
+      const hasValidId = todo.id || todo._id || todo.uuid
+      const hasValidTitle = todo.item || todo.title
+      
+      // Log warning jika ada data tidak valid (untuk debugging)
+      if (!hasValidId || !hasValidTitle) {
+        console.warn('⚠️ Skipping invalid todo from API:', {
+          todo,
+          hasValidId,
+          hasValidTitle
+        })
+      }
+      
+      return hasValidId && hasValidTitle
+    })
+    .map((todo: any) => {
+      const transformedTodo = {
+        // HANYA gunakan ID yang benar-benar ada dari API
+        id: todo.id || todo._id || todo.uuid,
+        title: todo.item || todo.title,
+        completed: todo.isDone || todo.completed || false,
+        userId: todo.userId || 'unknown',
+        userName: todo.userName || todo.userFullName || undefined,
+        createdAt: todo.createdAt || new Date().toISOString(),
+        updatedAt: todo.updatedAt || todo.createdAt || new Date().toISOString(),
+      }
+      
+      return transformedTodo
+    })
   
   const transformedResponse = {
     success: true,
@@ -94,13 +116,21 @@ export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
       todoData = {}
     }
     
-    // Transform to match our schema
+    // Validasi bahwa API mengembalikan ID yang valid
+    const apiId = todoData?.id || todoData?._id || todoData?.uuid
+    
+    if (!apiId) {
+      console.error('❌ API tidak mengembalikan ID yang valid:', todoData)
+      throw new Error('API Error: Todo berhasil dibuat tapi server tidak mengembalikan ID yang valid. Pastikan API endpoint berfungsi dengan benar.')
+    }
+    
+    // Transform to match our schema - HANYA dengan data valid dari API
     const transformedTodo = {
-      id: todoData?.id || todoData?._id || Math.random().toString(36).substr(2, 9),
+      id: apiId,  // HANYA gunakan ID dari API, tidak ada fallback
       title: todoData?.item || todoData?.title || data.title,
       completed: todoData?.isDone || todoData?.completed || false,
-      userId: todoData?.userId || 'current-user',
-      userName: todoData?.userName || todoData?.userFullName || 'Current User',
+      userId: todoData?.userId || 'unknown',
+      userName: todoData?.userName || todoData?.userFullName || undefined,
       createdAt: todoData?.createdAt || new Date().toISOString(),
       updatedAt: todoData?.updatedAt || new Date().toISOString(),
     }
@@ -179,7 +209,24 @@ export async function toggleTodo(id: string, action: 'DONE' | 'UNDONE' = 'DONE')
  * API untuk hapus todo
  */
 export async function deleteTodo(id: string): Promise<void> {
-  await apiClient.delete(`/todos/${id}`)
+  // Validasi ID sebelum mengirim request
+  if (!id || id === 'undefined' || id.trim() === '') {
+    throw new Error('Invalid todo ID: ID cannot be empty or undefined')
+  }
+  
+  try {
+    const response = await apiClient.delete(`/todos/${id}`)
+    return response.data
+  } catch (error: any) {
+    // Log error untuk debugging tanpa spam console
+    if (error?.response?.status === 404) {
+      console.error(`❌ Todo dengan ID '${id}' tidak ditemukan di server. Kemungkinan todo sudah dihapus atau ID tidak valid.`)
+      throw new Error(`Todo tidak ditemukan. ID '${id}' mungkin sudah tidak valid.`)
+    }
+    
+    console.error('❌ Delete failed:', error?.response?.data || error.message)
+    throw error
+  }
 }
 
 /**

@@ -21,21 +21,21 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Register Card */}
-      <main className="w-full max-w-4xl -mt-40 bg-white rounded-xl p-12 shadow-2xl z-10">
-        <h1 className="text-3xl font-extrabold text-gray-800 text-center mb-2">
+      {/* Register Card - Responsive */}
+      <main className="w-full max-w-4xl -mt-32 lg:-mt-40 mx-4 lg:mx-auto bg-white rounded-xl p-6 lg:p-12 shadow-2xl z-10">
+        <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-800 text-center mb-2">
           Register
         </h1>
-        <p className="text-center text-gray-500 text-xs mb-8 font-roboto">
+        <p className="text-center text-gray-500 text-xs lg:text-sm mb-6 lg:mb-8 font-roboto">
           Let's Sign up first for enter into Nodewave Website. Uh She Up!
         </p>
 
         <RegisterForm />
       </main>
 
-      {/* Bottom spacing */}
-      <div className="py-8">
-        <Link href="/login" className="text-blue-600 text-sm hover:text-blue-700 font-roboto">
+      {/* Bottom spacing - Responsive */}
+      <div className="py-6 lg:py-8 text-center">
+        <Link href="/login" className="text-blue-600 text-sm hover:text-blue-700 font-roboto transition-colors">
           Already have an account? Sign in
         </Link>
       </div>

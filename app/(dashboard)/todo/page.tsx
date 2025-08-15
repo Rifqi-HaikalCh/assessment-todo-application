@@ -45,8 +45,8 @@ export default function TodoPage() {
   
   // Render komponen todo untuk user biasa
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="p-4 lg:p-6 max-w-4xl mx-auto">
+      <h1 className="text-xl lg:text-2xl font-bold text-gray-800 mb-6">
         My To Do List
       </h1>
       
@@ -64,21 +64,25 @@ export default function TodoPage() {
       
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
           <p className="text-sm">Terjadi kesalahan saat memuat todos.</p>
         </div>
       )}
       
       {/* Daftar todos */}
       {!isLoading && !error && todosResponse?.data && (
-        <TodoList todos={todosResponse.data} showSelection={true} />
+        <div className="space-y-4">
+          <TodoList todos={todosResponse.data} showSelection={true} />
+        </div>
       )}
       
       {/* Empty State */}
       {!isLoading && !error && (!todosResponse?.data || todosResponse.data.length === 0) && (
-        <div className="bg-white rounded-lg p-8 shadow-sm text-center">
-          <p className="text-gray-600 mb-4">Belum ada todo yang dibuat.</p>
-          <p className="text-gray-500 text-sm">Gunakan form di atas untuk menambahkan todo pertama Anda!</p>
+        <div className="bg-white rounded-lg p-6 lg:p-8 shadow-sm text-center">
+          <div className="max-w-md mx-auto">
+            <p className="text-gray-600 mb-4">Belum ada todo yang dibuat.</p>
+            <p className="text-gray-500 text-sm">Gunakan form di atas untuk menambahkan todo pertama Anda!</p>
+          </div>
         </div>
       )}
     </div>

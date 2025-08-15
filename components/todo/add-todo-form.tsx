@@ -58,36 +58,43 @@ export function AddTodoForm() {
   const isLoading = isSubmitting || createTodoMutation.isPending
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4 mb-8">
-      <label htmlFor="newtask" className="text-gray-600 font-semibold text-sm">
-        Add a new task
-      </label>
-      <div className="flex space-x-4 items-center">
-        <input
-          id="newtask"
-          {...register('title')}
-          disabled={isLoading}
-          className="flex-grow border-b border-[#1e3a8a] text-2xl font-extrabold focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-          placeholder="Enter task..."
-        />
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="bg-[#0066ff] text-white font-bold px-5 py-2 rounded-md hover:bg-[#0051cc] transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? 'Adding...' : 'Add Todo'}
-        </Button>
-      </div>
-      {errors.title && (
-        <p className="text-xs text-red-500">{errors.title.message}</p>
-      )}
-      
-      {/* Optional: Tampilkan error dari mutation */}
-      {createTodoMutation.error && (
-        <p className="text-xs text-red-500">
-          {getErrorMessage(createTodoMutation.error)}
-        </p>
-      )}
-    </form>
+    <div className="bg-white rounded-2xl p-8 shadow-2xl mb-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-6">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Add New Todo</h2>
+          <p className="text-gray-600">Create a new task to keep track of your progress</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="relative">
+            <input
+              id="newtask"
+              {...register('title')}
+              disabled={isLoading}
+              className="w-full px-4 py-4 text-sm transition-all duration-200 border-2 rounded-xl bg-white focus:outline-none focus:ring-0 border-gray-300 hover:border-gray-400 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="Enter your task..."
+            />
+            {errors.title && (
+              <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Adding...' : 'Add Todo'}
+          </Button>
+        </div>
+        
+        {/* Error dari mutation */}
+        {createTodoMutation.error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <p className="text-sm">{getErrorMessage(createTodoMutation.error)}</p>
+          </div>
+        )}
+      </form>
+    </div>
   )
 }
