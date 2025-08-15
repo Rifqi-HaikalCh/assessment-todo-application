@@ -23,7 +23,7 @@ export default function LoginPage() {
       {/* Footer Link */}
       <div className="max-w-3xl mx-auto px-6 py-6 text-center text-blue-600 font-semibold text-sm">
         <Link href="/register" className="hover:text-blue-700">
-          Don't have a Square account? Sign up
+          Don't have a Nodewave account? Sign up
         </Link>
       </div>
 

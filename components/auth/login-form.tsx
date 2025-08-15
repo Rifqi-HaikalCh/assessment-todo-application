@@ -162,7 +162,7 @@ export function LoginForm() {
       {/* Registration Link */}
       <div className="text-center">
         <p className="text-gray-600 text-sm">
-          Don't have a Square account?{' '}
+          Don't have a Nodewave account?{' '}
           <Link
             href="/register"
             className="text-blue-500 font-semibold hover:text-blue-600 transition-colors"
