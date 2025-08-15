@@ -14,7 +14,7 @@ export function Footer({ className }: FooterProps) {
     )}>
       {/* Text copyright dengan nama gua */}
       <p className="text-sm text-gray-600 font-roboto">
-        © @RifqiHaikal-2025
+        © RifqiHaikal-2025
       </p>
     </footer>
   )

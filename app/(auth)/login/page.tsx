@@ -33,20 +33,6 @@ export default function LoginPage() {
       {/* Footer */}
       <Footer />
 
-      {/* Bottom Wave Shape */}
-      <div className="absolute bottom-0 left-0 w-full pointer-events-none select-none" style={{ zIndex: 0 }}>
-        <svg
-          className="w-full h-32"
-          viewBox="0 0 1920 300"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 100C320 50 640 150 960 100C1280 50 1600 150 1920 100V300H0V100Z"
-            fill="#FAFBFD"
-          />
-        </svg>
-      </div>
     </div>
   )
 }

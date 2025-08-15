@@ -9,7 +9,6 @@ import { useLogout } from '@/lib/hooks/use-auth'
 import { useAdminTodos } from '@/lib/hooks/use-admin-todos'
 import { AdminFilter } from '@/lib/schemas/admin.schema'
 import { RoleGuard } from '@/components/auth/role-guard'
-import { Footer } from '@/components/layout/footer'
 import { cn } from '@/lib/utils'
 
 /**
@@ -409,8 +408,6 @@ export default function AdminPage() {
             </section>
           </main>
           
-          {/* Footer */}
-          <Footer />
         </div>
       </div>
     </RoleGuard>
