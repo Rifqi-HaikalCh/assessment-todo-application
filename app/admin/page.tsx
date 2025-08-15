@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Home, ChevronLeft, Search, ChevronDown, ChevronRight } from 'lucide-react'
+import { Home, ChevronLeft, Search, ChevronDown, ChevronRight, User, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { useLogout } from '@/lib/hooks/use-auth'
 import { useAdminTodos } from '@/lib/hooks/use-admin-todos'
@@ -29,6 +29,7 @@ export default function AdminPage() {
     search: '',
   })
   const [searchValue, setSearchValue] = React.useState('')
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = React.useState(false)
 
   // Fetch data todos
   const { data, isLoading, error } = useAdminTodos(filter)
@@ -81,6 +82,35 @@ export default function AdminPage() {
     logout()
     router.push('/login')
   }
+
+  const handleProfileClick = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen)
+  }
+
+  const handleViewProfile = () => {
+    setIsProfileDropdownOpen(false)
+    router.push('/profile')
+  }
+
+  const handleLogoutClick = () => {
+    setIsProfileDropdownOpen(false)
+    handleLogout()
+  }
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (!target.closest('.profile-dropdown')) {
+        setIsProfileDropdownOpen(false)
+      }
+    }
+
+    if (isProfileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isProfileDropdownOpen])
   
   const filteredTodos = getFilteredTodos()
   const totalPages = Math.ceil(filteredTodos.length / filter.limit) || 1
@@ -161,20 +191,50 @@ export default function AdminPage() {
                 </svg>
               </button>
 
-              {/* User info */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-700 hidden sm:block">
-                  {user?.name || 'User'}
-                </span>
-                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-300">
-                  <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
-                    {user?.name?.charAt(0).toUpperCase() || 'A'}
+              {/* User info with dropdown */}
+              <div className="relative profile-dropdown">
+                <button 
+                  onClick={handleProfileClick}
+                  className="flex items-center gap-3 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+                >
+                  <span className="text-sm text-gray-700 hidden sm:block">
+                    {user?.name || 'User'}
+                  </span>
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-300">
+                    <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-xs font-semibold">
+                      {user?.name?.charAt(0).toUpperCase() || 'A'}
+                    </div>
+                    <span 
+                      aria-label="Online status" 
+                      className="absolute bottom-0 right-0 block w-3 h-3 rounded-full border-2 border-white bg-green-500"
+                    />
                   </div>
-                  <span 
-                    aria-label="Online status" 
-                    className="absolute bottom-0 right-0 block w-3 h-3 rounded-full border-2 border-white bg-green-500"
-                  />
-                </div>
+                  <ChevronDown className={cn(
+                    "w-4 h-4 text-gray-400 transition-transform hidden sm:block",
+                    isProfileDropdownOpen && "rotate-180"
+                  )} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <button
+                      onClick={handleViewProfile}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      Lihat Profile
+                    </button>
+                    <hr className="my-1 border-gray-200" />
+                    <button
+                      onClick={handleLogoutClick}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </header>
 
