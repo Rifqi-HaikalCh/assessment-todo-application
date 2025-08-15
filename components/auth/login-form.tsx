@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Modal } from '@/components/ui/modal'
 import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema'
 import { useLogin } from '@/lib/hooks/use-auth'
 import { cn } from '@/lib/utils'
@@ -19,6 +20,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const loginMutation = useLogin()
   
   // Setup form dengan validasi schema
@@ -153,12 +155,13 @@ export function LoginForm() {
           />
           <span>Remember Me</span>
         </label>
-        <Link
-          href="/forgot-password"
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
           className="text-blue-500 text-sm font-semibold hover:text-blue-600 transition-colors"
         >
           Forgot Password
-        </Link>
+        </button>
       </div>
 
       {/* Submit Button */}
@@ -169,6 +172,38 @@ export function LoginForm() {
       >
         {isSubmitting || loginMutation.isPending ? 'Loading...' : 'Login'}
       </Button>
+      
+      {/* Registration Link */}
+      <div className="text-center">
+        <p className="text-gray-600 text-sm">
+          Don't have a Nodewave account?{' '}
+          <Link
+            href="/register"
+            className="text-blue-500 font-semibold hover:text-blue-600 transition-colors"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
+      
+      {/* Forgot Password Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Oops!"
+      >
+        <div className="text-center py-4">
+          <p className="text-gray-600 mb-4">
+            Duh, maaf halaman ini tidak ada
+          </p>
+          <Button
+            onClick={() => setIsModalOpen(false)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm"
+          >
+            Tutup
+          </Button>
+        </div>
+      </Modal>
       
     </form>
   )

@@ -169,7 +169,7 @@ export default function AdminPage() {
                 className="flex items-center gap-2 rounded-lg bg-gray-200 text-gray-700 px-4 py-2 text-sm font-semibold select-none"
               >
                 <Home className="w-4 h-4" />
-                {!isCollapsed && "To do"}
+                {!isCollapsed && "Dashboard"}
               </Link>
             </nav>
           </aside>

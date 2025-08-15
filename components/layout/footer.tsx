@@ -9,7 +9,7 @@ interface FooterProps {
 export function Footer({ className }: FooterProps) {
   return (
     <footer className={cn(
-      "py-4 bg-white border-t border-gray-200 text-center", // styling default footer
+      "mt-auto py-6 bg-white border-t border-gray-200 text-center w-full", // styling default footer
       className // merge sama custom class kalo ada
     )}>
       {/* Text copyright dengan nama gua */}

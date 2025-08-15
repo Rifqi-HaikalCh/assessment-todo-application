@@ -29,9 +29,9 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#dedede] flex flex-col font-inter">
       {/* Main Content - Responsive */}
-      <main className="flex justify-center pt-12 lg:pt-20 px-4 lg:px-6 pb-12 lg:pb-20">
+      <main className="flex-1 flex justify-center py-12 lg:py-20 px-4 lg:px-6">
         <section 
-          className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 lg:p-8"
+          className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 lg:p-8 h-fit"
           style={{ boxShadow: "10px 10px 20px rgba(0,0,0,0.1)" }}
         >
           {/* Back Button */}
