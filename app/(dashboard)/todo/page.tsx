@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Header } from '@/components/layout/header'
+import { useState, useMemo } from 'react'
 import { AddTodoForm } from '@/components/todo/add-todo-form'
 import { TodoList } from '@/components/todo/todo-list'
 import { useTodos } from '@/lib/hooks/use-todos'
+import { useSearchStore } from '@/lib/store/search.store'
 import { TodoFilter } from '@/lib/schemas/todo.schema'
 
 export default function TodoPage() {
@@ -14,14 +14,23 @@ export default function TodoPage() {
     limit: 20,
   })
 
+  const { searchQuery } = useSearchStore()
   const { data, isLoading, error } = useTodos(filter)
+
+  // Filter todos berdasarkan search query
+  const filteredTodos = useMemo(() => {
+    if (!data?.data || !searchQuery.trim()) {
+      return data?.data || []
+    }
+    
+    return data.data.filter(todo => 
+      todo.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [data?.data, searchQuery])
 
   return (
     <div className="min-h-screen bg-[#dedede] flex flex-col font-inter">
-      {/* Header */}
-      <Header />
-
-      {/* Top white shape with title */}
+      {/* Top white shape with title - HEADER DIHAPUS KARENA SUDAH ADA DI LAYOUT */}
       <div className="relative bg-white flex justify-center pt-16 pb-20 px-6">
         <div className="absolute top-0 left-0 w-20 h-20 rounded-bl-3xl bg-white" 
           style={{ clipPath: "polygon(0 0, 100% 0, 0 100%)" }}
@@ -38,7 +47,7 @@ export default function TodoPage() {
           {/* Add Todo Form */}
           <AddTodoForm />
 
-          {/* Todo List */}
+          {/* Todo List dengan search functionality */}
           {isLoading ? (
             <div className="text-center py-8">
               <p className="text-gray-500">Loading todos...</p>
@@ -48,7 +57,17 @@ export default function TodoPage() {
               <p className="text-red-500">Error loading todos</p>
             </div>
           ) : (
-            <TodoList todos={data?.data || []} showSelection />
+            <>
+              {searchQuery && (
+                <div className="mb-4 text-sm text-gray-600">
+                  {filteredTodos.length > 0 
+                    ? `Ditemukan ${filteredTodos.length} todo untuk "${searchQuery}"`
+                    : `Tidak ada todo yang cocok dengan "${searchQuery}"`
+                  }
+                </div>
+              )}
+              <TodoList todos={filteredTodos} showSelection />
+            </>
           )}
         </section>
       </main>

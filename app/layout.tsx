@@ -1,27 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
-import './globals.css'
 import { Providers } from './providers'
+import './globals.css'
 
-// Font configurations
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-})
-
-const poppins = Poppins({ 
-  weight: ['400', '600', '700'],
-  subsets: ['latin'],
-  variable: '--font-poppins',
-})
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Nodewave To Do',
-  description: 'Aplikasi manajemen tugas yang simpel dan efektif',
-  icons: {
-    icon: '/favicon.ico',
-  },
+  title: 'Nodewave Todo App',
+  description: 'Aplikasi manajemen tugas dengan Next.js 14',
 }
 
 export default function RootLayout({
@@ -30,15 +17,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="en">
       <body className={inter.className}>
         <Providers>
           {children}
           <Toaster 
             position="top-right"
             richColors
+            expand={false}
             closeButton
-            duration={3000}
           />
         </Providers>
       </body>
