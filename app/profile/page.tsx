@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCurrentUser, useLogout } from '@/lib/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/layout/footer'
 import { getInitials } from '@/lib/utils'
 
 export default function ProfilePage() {
@@ -129,6 +130,9 @@ export default function ProfilePage() {
           </div>
         </section>
       </main>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

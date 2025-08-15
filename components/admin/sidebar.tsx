@@ -42,7 +42,7 @@ export function AdminSidebar() {
           )}
         >
           <i className="fas fa-home"></i>
-          To do
+          Dashboard
         </Link>
         
         {/* Tambahan menu admin lainnya jika diperlukan */}

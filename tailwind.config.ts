@@ -1,3 +1,6 @@
+// Tailwind config yang udah gua customize buat project ini
+// Tambahan font family, colors, sama animations yang dibutuhin
+// Rifqi Haikal - 2025
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -21,6 +24,7 @@ const config = {
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
         'poppins': ['Poppins', 'sans-serif'],
+        'roboto': ['Roboto', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

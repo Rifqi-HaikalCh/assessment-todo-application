@@ -1,3 +1,5 @@
+// Header component - main navigation di atas
+// Udah include search functionality sama user dropdown
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
@@ -10,10 +12,11 @@ import { getInitials } from '@/lib/utils'
 import Link from 'next/link'
 
 interface HeaderProps {
-  showSearch?: boolean
+  showSearch?: boolean // buat nentuin mau nampil search bar atau enggak
 }
 
 export function Header({ showSearch = false }: HeaderProps) {
+  // Ambil data user yang lagi login
   const user = useCurrentUser()
   const logout = useLogout()
   const { searchQuery, setSearchQuery } = useSearchStore()
@@ -21,7 +24,7 @@ export function Header({ showSearch = false }: HeaderProps) {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Handle keyboard shortcut (Ctrl+/)
+  // Keyboard shortcut buat fokus ke search (Ctrl+/) - ide bagus nih
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === '/') {
@@ -35,7 +38,7 @@ export function Header({ showSearch = false }: HeaderProps) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Close dropdown when clicking outside
+  // Tutup dropdown kalo klik di luar area - biar UX nya bagus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -47,6 +50,7 @@ export function Header({ showSearch = false }: HeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Handler buat update search query
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }

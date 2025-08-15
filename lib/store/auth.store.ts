@@ -1,8 +1,11 @@
+// Auth store pake Zustand - state management buat authentication
+// Include persist middleware biar auth state gak hilang pas refresh
+// Design pattern yang gua pake: simple tapi powerful - @RifqiHaikal-2025
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 /**
- * Interface untuk User
+ * Interface User - define structure data user
  */
 interface User {
   id: string

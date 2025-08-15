@@ -1,3 +1,5 @@
+// API client buat todos - ini yang handle semua komunikasi sama backend
+// Gua bikin dengan error handling yang proper dan data transformation
 import apiClient from './client'
 import {
   Todo,
@@ -12,7 +14,8 @@ import {
 } from '@/lib/schemas/todo.schema'
 
 /**
- * API untuk mengambil semua todos
+ * Get semua todos - ini function yang paling sering dipanggil
+ * Udah include data transformation biar response konsisten
  */
 export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
   const response = await apiClient.get('/todos')
@@ -89,44 +92,41 @@ export async function getTodo(id: string): Promise<TodoResponse> {
 }
 
 /**
- * API untuk membuat todo baru
+ * Bikin todo baru - function ini lumayan kompleks karena harus handle
+ * berbagai format response dari API yang gak konsisten
  */
 export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
   try {
     const response = await apiClient.post('/todos', {
-      item: data.title
+      item: data.title // API expect 'item', bukan 'title'
     })
     
-    // Transform API response to match our schema
+    // Transform response - API nya kadang beda-beda format responnya
     const apiResponse = response.data
     
-    // The API might return different structures, let's handle them
+    // Handle different response structures - defensive programming nih
     let todoData
     if (apiResponse?.content) {
-      // If API returns { content: { ... } }
-      todoData = apiResponse.content
+      todoData = apiResponse.content // format { content: { ... } }
     } else if (apiResponse?.data) {
-      // If API returns { data: { ... } }
-      todoData = apiResponse.data
+      todoData = apiResponse.data // format { data: { ... } }
     } else if (apiResponse) {
-      // If API returns the todo object directly
-      todoData = apiResponse
+      todoData = apiResponse // direct object
     } else {
-      // Fallback if response is empty
-      todoData = {}
+      todoData = {} // fallback kalo kosong
     }
     
-    // Validasi bahwa API mengembalikan ID yang valid
+    // Validasi ID - ini penting banget biar gak error di UI
     const apiId = todoData?.id || todoData?._id || todoData?.uuid
     
     if (!apiId) {
-      console.error('❌ API tidak mengembalikan ID yang valid:', todoData)
-      throw new Error('API Error: Todo berhasil dibuat tapi server tidak mengembalikan ID yang valid. Pastikan API endpoint berfungsi dengan benar.')
+      console.error('❌ API gak return ID yang valid:', todoData)
+      throw new Error('API Error: Todo berhasil dibuat tapi server gak return ID yang valid')
     }
     
-    // Transform to match our schema - HANYA dengan data valid dari API
+    // Transform biar match sama schema kita
     const transformedTodo = {
-      id: apiId,  // HANYA gunakan ID dari API, tidak ada fallback
+      id: apiId, // pake ID dari API aja
       title: todoData?.item || todoData?.title || data.title,
       completed: todoData?.isDone || todoData?.completed || false,
       userId: todoData?.userId || 'unknown',

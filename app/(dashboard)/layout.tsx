@@ -1,7 +1,13 @@
+/*
+ * Dashboard Layout - main layout buat user yang udah login
+ * Dibuat sama Rifqi dengan responsive design yang mantap
+ * Include sidebar, header, sama footer yang konsisten
+ */
 'use client'
 
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 import { useSidebarStore } from '@/lib/store/sidebar.store'
 import { cn } from '@/lib/utils'
 
@@ -30,6 +36,9 @@ export default function DashboardLayout({
         <div className="flex-1 overflow-hidden">
           {children}
         </div>
+        
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   )

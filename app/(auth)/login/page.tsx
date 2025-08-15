@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { LoginForm } from '@/components/auth/login-form'
+import { Footer } from '@/components/layout/footer'
 
 export default function LoginPage() {
   return (
@@ -8,7 +9,7 @@ export default function LoginPage() {
       <div className="flex-grow relative">
         {/* Header - Responsive */}
         <div className="max-w-3xl mx-auto px-4 lg:px-6 pt-12 lg:pt-20 text-center">
-          <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-800">Log In</h1>
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-800">Sign In</h1>
           <p className="mt-3 text-gray-500 text-sm lg:text-base">
             Just sign in if you have an account in here. Enjoy our Website
           </p>
@@ -28,6 +29,9 @@ export default function LoginPage() {
           Don't have a Nodewave account? Sign up
         </Link>
       </div>
+      
+      {/* Footer */}
+      <Footer />
 
       {/* Bottom Wave Shape */}
       <div className="absolute bottom-0 left-0 w-full pointer-events-none select-none" style={{ zIndex: 0 }}>

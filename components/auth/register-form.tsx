@@ -334,10 +334,15 @@ export function RegisterForm() {
                 {...register('password')}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
+                autoComplete="new-password"
+                style={{
+                  WebkitAppearance: 'none'
+                } as React.CSSProperties}
                 className={`
                   w-full px-3 py-3 pr-10 text-sm transition-all duration-200 
                   border-2 rounded-lg bg-white
                   focus:outline-none focus:ring-0
+                  [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden
                   ${errors.password 
                     ? 'border-red-400 focus:border-red-500' 
                     : passwordFocused 
@@ -384,10 +389,15 @@ export function RegisterForm() {
                 {...register('confirmPassword')}
                 onFocus={() => setConfirmPasswordFocused(true)}
                 onBlur={() => setConfirmPasswordFocused(false)}
+                autoComplete="new-password"
+                style={{
+                  WebkitAppearance: 'none'
+                } as React.CSSProperties}
                 className={`
                   w-full px-3 py-3 pr-10 text-sm transition-all duration-200 
                   border-2 rounded-lg bg-white
                   focus:outline-none focus:ring-0
+                  [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden
                   ${errors.confirmPassword 
                     ? 'border-red-400 focus:border-red-500' 
                     : confirmPasswordFocused 

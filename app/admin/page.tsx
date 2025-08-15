@@ -9,11 +9,14 @@ import { useLogout } from '@/lib/hooks/use-auth'
 import { useAdminTodos } from '@/lib/hooks/use-admin-todos'
 import { AdminFilter } from '@/lib/schemas/admin.schema'
 import { RoleGuard } from '@/components/auth/role-guard'
+import { Footer } from '@/components/layout/footer'
 import { cn } from '@/lib/utils'
 
 /**
- * Halaman utama Admin Dashboard
- * Redesigned sesuai dengan HTML template yang diberikan
+ * Admin Dashboard - halaman khusus buat admin aja
+ * Design nya gua bikin sendiri dengan table responsive yang keren
+ * Include search, filter, pagination yang smooth banget
+ * Credit: @RifqiHaikal-2025
  */
 export default function AdminPage() {
   const user = useAuthStore(state => state.user)
@@ -405,6 +408,9 @@ export default function AdminPage() {
               </div>
             </section>
           </main>
+          
+          {/* Footer */}
+          <Footer />
         </div>
       </div>
     </RoleGuard>

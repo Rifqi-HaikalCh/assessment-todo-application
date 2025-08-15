@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { RegisterForm } from '@/components/auth/register-form'
+import { Footer } from '@/components/layout/footer'
 
 export default function RegisterPage() {
   return (
@@ -39,6 +40,9 @@ export default function RegisterPage() {
           Already have an account? Sign in
         </Link>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

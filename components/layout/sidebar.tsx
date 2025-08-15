@@ -15,7 +15,7 @@ export function Sidebar() {
 
   const menuItems = [
     {
-      label: 'To do',
+      label: 'Dashboard',
       href: '/todo',
       icon: Home,
       show: true,
