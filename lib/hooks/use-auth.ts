@@ -116,22 +116,43 @@ export function useVerifyToken() {
 export function useLogout() {
   const router = useRouter()
   const { logout: clearAuth } = useAuthStore()
-  
+  const { showTransition, hideTransition } = useTransitionStore() // <-- Gunakan transition store
+
   const handleLogout = async () => {
     try {
-      // Clear auth state
-      clearAuth()
-      
-      // Tampilkan pesan
-      toast.success('Logout berhasil')
-      
-      // Redirect ke login
-      router.push('/login')
+      // Tampilkan splash screen
+      showTransition();
+
+      // Durasi splash screen terlihat (misalnya 1 detik saat logout)
+      const splashDuration = 1000;
+      // Durasi fade-out (sesuaikan dengan CSS di LoginTransition)
+      const fadeOutDuration = 500;
+
+      // Hapus auth state setelah delay singkat (biar splash terlihat dulu)
+      setTimeout(() => {
+        clearAuth() // Panggil clearAuth di sini
+
+        // Mulai sembunyikan splash screen setelah splashDuration
+        setTimeout(() => {
+          hideTransition();
+
+          // Tunggu fade-out selesai, baru redirect dan tampilkan toast
+          setTimeout(() => {
+            router.push('/login'); // Redirect setelah fade out
+            toast.success('Logout berhasil');
+          }, fadeOutDuration);
+
+        }, splashDuration);
+
+      }, 100); // Delay kecil sebelum clear state
+
     } catch (error) {
       console.error('Logout error:', error)
+      hideTransition(); // Pastikan transisi disembunyikan jika ada error
+      toast.error("Gagal melakukan logout."); // Tambahkan toast error jika perlu
     }
   }
-  
+
   return handleLogout
 }
 
