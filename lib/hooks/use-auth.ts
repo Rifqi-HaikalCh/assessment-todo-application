@@ -90,37 +90,17 @@ export function useVerifyToken() {
   })
 }
 
-const ANIMATION_DURATION = 1000;
-const FADE_OUT_DURATION = 500; 
-const TOTAL_TRANSITION_DURATION = ANIMATION_DURATION + FADE_OUT_DURATION + 100;
 export function useLogout() {
   const router = useRouter();
   const { logout: clearAuth } = useAuthStore();
-  const { showTransition, hideTransition } = useTransitionStore();
-
   const handleLogout = async () => {
     try {
-      showTransition();
-
-      const animationDuration = 1000;
-      const fadeOutDuration = 500;
-
-      const clearAuthTimer = setTimeout(() => {
-        clearAuth();
-      }, 3500);
-
-      const hideTimer = setTimeout(() => {
-        hideTransition();
-      }, animationDuration);
-
-      const redirectTimer = setTimeout(() => {
-        router.push('/login');
-        toast.success('Logout berhasil');
-      }, animationDuration + fadeOutDuration);
+      clearAuth();
+      router.push('/login');
+      toast.success('Logout berhasil');
 
     } catch (error) {
       console.error('Logout error:', error);
-      hideTransition();
       toast.error("Gagal melakukan logout.");
     }
   };
