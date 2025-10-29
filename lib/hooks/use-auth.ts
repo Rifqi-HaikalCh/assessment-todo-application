@@ -110,50 +110,55 @@ export function useVerifyToken() {
   })
 }
 
+const ANIMATION_DURATION = 1000; // Samakan dengan di LoginTransition.tsx
+const FADE_OUT_DURATION = 500;   // Samakan dengan di LoginTransition.tsx
+const TOTAL_TRANSITION_DURATION = ANIMATION_DURATION + FADE_OUT_DURATION + 100; // Tambah sedikit buffer
+
 /**
  * Hook untuk logout
  */
 export function useLogout() {
   const router = useRouter()
   const { logout: clearAuth } = useAuthStore()
-  const { showTransition, hideTransition } = useTransitionStore() // <-- Gunakan transition store
+  const { showTransition, hideTransition } = useTransitionStore()
 
   const handleLogout = async () => {
     try {
       // Tampilkan splash screen
       showTransition();
 
-      // Durasi splash screen terlihat (misalnya 1 detik saat logout)
-      const splashDuration = 1000;
-      // Durasi fade-out (sesuaikan dengan CSS di LoginTransition)
-      const fadeOutDuration = 500;
+      // Durasi total untuk menunggu sebelum redirect
+      const redirectDelay = TOTAL_TRANSITION_DURATION;
 
-      // Hapus auth state setelah delay singkat (biar splash terlihat dulu)
-      setTimeout(() => {
-        clearAuth() // Panggil clearAuth di sini
+      // Hapus auth state setelah delay singkat (agar state tidak hilang saat animasi dimulai)
+      const clearAuthTimer = setTimeout(() => {
+        clearAuth();
+      }, 100); // Waktu kecil
 
-        // Mulai sembunyikan splash screen setelah splashDuration
-        setTimeout(() => {
-          hideTransition();
+      // Mulai sembunyikan (trigger fade-out) setelah durasi animasi utama
+      const hideTimer = setTimeout(() => {
+        hideTransition();
+      }, ANIMATION_DURATION); // Mulai fade out setelah animasi text/bar selesai
 
-          // Tunggu fade-out selesai, baru redirect dan tampilkan toast
-          setTimeout(() => {
-            router.push('/login'); // Redirect setelah fade out
-            toast.success('Logout berhasil');
-          }, fadeOutDuration);
+      // Redirect setelah seluruh animasi + fade out selesai
+      const redirectTimer = setTimeout(() => {
+        router.push('/login');
+        toast.success('Logout berhasil');
+      }, redirectDelay); // Tunggu total durasi
 
-        }, splashDuration);
-
-      }, 100); // Delay kecil sebelum clear state
+      // Simpan timer ID untuk cleanup jika perlu (meskipun biasanya tidak perlu di sini)
+      // const timers = [clearAuthTimer, hideTimer, redirectTimer];
 
     } catch (error) {
-      console.error('Logout error:', error)
-      hideTransition(); // Pastikan transisi disembunyikan jika ada error
-      toast.error("Gagal melakukan logout."); // Tambahkan toast error jika perlu
+      console.error('Logout error:', error);
+      hideTransition(); // Pastikan disembunyikan jika error
+      toast.error("Gagal melakukan logout.");
+      // Jika error, pastikan tidak ada redirect yang tertunda
+      // clearTimeout(redirectTimer); // Anda perlu menyimpan timer ID jika ingin cancel
     }
-  }
+  };
 
-  return handleLogout
+  return handleLogout;
 }
 
 /**
