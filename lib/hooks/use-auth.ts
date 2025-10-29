@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/lib/store/auth.store'
+import { useTransitionStore } from '@/lib/store/transition.store'
 import { login, register, verifyToken } from '@/lib/api/auth'
 import { LoginInput, RegisterInput } from '@/lib/schemas/auth.schema'
 import { getErrorMessage } from '@/lib/api/client'
@@ -12,6 +13,7 @@ import { getErrorMessage } from '@/lib/api/client'
 export function useLogin() {
   const router = useRouter()
   const { login: setAuth } = useAuthStore()
+  const { showTransition, hideTransition } = useTransitionStore()
   
   return useMutation({
     mutationFn: (data: LoginInput) => login(data),
@@ -20,15 +22,20 @@ export function useLogin() {
         // Simpan auth data ke store
         setAuth(response.data.user, response.data.token)
         
-        // Tampilkan pesan sukses
-        toast.success('Login berhasil!')
+        // Tampilkan animasi transisi
+        showTransition()
         
-        // Redirect berdasarkan role
-        if (response.data.user.role === 'admin') {
-          router.push('/admin')
-        } else {
-          router.push('/todo')
-        }
+        // Tunggu animasi, lalu redirect dan sembunyikan transisi
+        setTimeout(() => {
+          const destination = response.data.user.role === 'admin' ? '/admin' : '/todo';
+          router.push(destination);
+          
+          // Sembunyikan overlay setelah navigasi dimulai
+          hideTransition();
+          toast.success('Login berhasil!');
+
+        }, 2000) // Durasi untuk melihat animasi
+
       } else {
         toast.error(response.message || 'Login gagal')
       }

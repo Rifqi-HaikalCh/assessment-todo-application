@@ -43,37 +43,16 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // Handle error berdasarkan status code
     if (error.response) {
       const status = error.response.status
-      const message = (error.response.data as any)?.message || 'Terjadi kesalahan'
-      
-      switch (status) {
-        case 401:
-          // Token expired atau invalid
-          toast.error('Sesi Anda telah berakhir. Silakan login kembali.')
-          useAuthStore.getState().logout()
-          break
-        case 403:
-          toast.error('Anda tidak memiliki akses untuk melakukan aksi ini')
-          break
-        case 404:
-          toast.error('Data tidak ditemukan')
-          break
-        case 422:
-          // Validation error - biasanya ditangani di component
-          break
-        case 500:
-          toast.error('Terjadi kesalahan pada server')
-          break
-        default:
-          toast.error(message)
+      // Hanya tangani error global di sini, seperti 401
+      if (status === 401) {
+        toast.error('Sesi Anda telah berakhir. Silakan login kembali.')
+        useAuthStore.getState().logout()
       }
     } else if (error.request) {
-      // Request dibuat tapi tidak ada response
       toast.error('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.')
     } else {
-      // Error lainnya
       toast.error('Terjadi kesalahan yang tidak diketahui')
     }
     
@@ -84,14 +63,25 @@ apiClient.interceptors.response.use(
 export default apiClient
 
 /**
- * Helper function untuk extract error message
+ * Helper function untuk extract error message yang lebih user-friendly
  */
 export function getErrorMessage(error: unknown): string {
-  if (error instanceof AxiosError) {
-    return (error.response?.data as any)?.message || error.message || 'Terjadi kesalahan'
+  if (error instanceof AxiosError && error.response?.data) {
+    const data = error.response.data as any;
+    // Prioritaskan array 'errors' jika ada dan tidak kosong
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      // Ambil pesan pertama dari array, capitalize huruf pertama
+      const firstError = data.errors[0];
+      return firstError.charAt(0).toUpperCase() + firstError.slice(1);
+    }
+    // Fallback ke properti 'message' jika ada
+    if (data.message) {
+      return data.message;
+    }
   }
+  // Fallback untuk error lainnya
   if (error instanceof Error) {
-    return error.message
+    return error.message;
   }
-  return 'Terjadi kesalahan yang tidak diketahui'
+  return 'Terjadi kesalahan yang tidak diketahui';
 }

@@ -8,8 +8,10 @@ import { useAuthStore } from '@/lib/store/auth.store'
 import { useSearchStore } from '@/lib/store/search.store'
 import { TodoList } from '@/components/todo/todo-list'
 import { AddTodoForm } from '@/components/todo/add-todo-form'
+import { RefreshCw } from 'lucide-react'
 import { useTodos } from '@/lib/hooks/use-todos'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 type FilterStatus = 'all' | 'completed' | 'pending'
 
@@ -22,8 +24,19 @@ export default function TodoPage() {
   const user = useAuthStore(state => state.user)
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const { searchQuery } = useSearchStore() // search dari header
-  const { data: todosResponse, isLoading, error } = useTodos()
+  const { data: todosResponse, isLoading, error, refetch } = useTodos()
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
+  const [isSpinning, setIsSpinning] = useState(false)
+
+  const handleRefresh = () => {
+    setIsSpinning(true)
+    refetch()
+
+    setTimeout(() => {
+      setIsSpinning(false)
+      toast.success('Data berhasil diperbarui')
+    }, 2000)
+  }
 
   // Filter todos berdasarkan search query dan status - real time filtering nih
   const filteredTodos = React.useMemo(() => {
@@ -128,25 +141,43 @@ export default function TodoPage() {
             <AddTodoForm />
           </div>
 
-          {/* Filter Buttons */}
-          <div className="flex items-center space-x-2 mb-6">
-            {(['all', 'pending', 'completed'] as FilterStatus[]).map(status => (
-              <Button
-                key={status}
-                variant={filterStatus === status ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFilterStatus(status)}
-                className="capitalize"
-              >
-                {status}
-              </Button>
-            ))}
+          {/* Filter and Refresh Buttons */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-2">
+              {(['all', 'pending', 'completed'] as FilterStatus[]).map(status => (
+                <Button
+                  key={status}
+                  variant={filterStatus === status ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterStatus(status)}
+                  className="capitalize"
+                >
+                  {status}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isSpinning}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isSpinning ? 'animate-spin' : ''}`} />
+              {isSpinning ? 'Refreshing...' : 'Refresh'}
+            </Button>
           </div>
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex justify-center items-center py-8">
-              <div className="text-gray-500">Loading todos...</div>
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow animate-pulse">
+                  <div className="h-6 w-6 bg-gray-200 rounded-md"></div>
+                  <div className="flex-1 space-y-2 py-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

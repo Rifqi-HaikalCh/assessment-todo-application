@@ -1,499 +1,239 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState, forwardRef } from 'react'
+import { useForm, UseFormRegisterReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff, ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { useRegister } from '@/lib/hooks/use-auth'
+import { cn } from '@/lib/utils'
 
-// Schema validation untuk register form
+// Zod schema for validation
 const registerSchema = z.object({
-  firstName: z.string().min(1, 'First Name harus diisi'),
-  lastName: z.string().min(1, 'Last Name harus diisi'),
+  firstName: z.string().min(1, 'First Name is required'),
+  lastName: z.string().min(1, 'Last Name is required'),
   phoneCode: z.string().default('+62'),
-  phoneNumber: z.string().optional(), // Optional karena tidak dikirim ke API
-  country: z.string().optional(), // Optional karena tidak dikirim ke API
-  mailAddress: z.string().min(1, 'Mail Address harus diisi'),
-  password: z.string().min(6, 'Password minimal 6 karakter'),
-  confirmPassword: z.string().min(1, 'Confirm Password harus diisi'),
-  about: z.string().optional() // Optional karena tidak dikirim ke API
+  phoneNumber: z.string().optional(),
+  country: z.string().optional(),
+  mailAddress: z.string().min(1, 'Mail Address is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string(),
+  about: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Password tidak sama",
+  message: "Passwords don't match",
   path: ["confirmPassword"],
-})
+});
 
-type RegisterFormData = z.infer<typeof registerSchema>
+type RegisterFormData = z.infer<typeof registerSchema>;
 
-const countries = [
-  { value: 'indonesia', label: 'Indonesia' },
-  { value: 'singapore', label: 'Singapore' },
-  { value: 'malaysia', label: 'Malaysia' },
-  { value: 'thailand', label: 'Thailand' },
-  { value: 'philippines', label: 'Philippines' },
-]
+// Reusable Floating Label Input Component
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  id: string;
+  label: string;
+  error?: string;
+  registration: Partial<UseFormRegisterReturn>;
+  rightIcon?: React.ReactNode;
+}
 
-const phoneCodes = [
-  { value: '+62', label: '+62', country: 'ID' },
-  { value: '+65', label: '+65', country: 'SG' },
-  { value: '+60', label: '+60', country: 'MY' },
-  { value: '+66', label: '+66', country: 'TH' },
-  { value: '+63', label: '+63', country: 'PH' },
-]
+const FloatingLabelInput = forwardRef<HTMLInputElement, InputProps>((
+  { id, label, error, registration, rightIcon, className, ...props }, ref
+) => (
+  <div className="relative">
+    <input
+      id={id}
+      ref={ref}
+      className={cn(
+        "peer w-full px-3 py-3 text-sm transition-all duration-200 border-2 rounded-lg bg-white focus:outline-none focus:ring-0 placeholder-transparent disabled:bg-gray-50 disabled:cursor-not-allowed",
+        error 
+          ? 'border-red-400 focus:border-red-500' 
+          : 'border-gray-300 focus:border-blue-500 hover:border-gray-400',
+        rightIcon && "pr-10",
+        className
+      )}
+      placeholder={label}
+      {...registration}
+      {...props}
+    />
+    <label
+      htmlFor={id}
+      className={cn(
+        "absolute left-2 -top-2.5 px-1 bg-white text-xs font-medium transition-all duration-200 pointer-events-none",
+        "peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400",
+        "peer-focus:-top-2.5 peer-focus:text-xs peer-focus:font-medium",
+        error ? "text-red-500 peer-focus:text-red-500" : "text-gray-500 peer-focus:text-blue-500"
+      )}
+    >
+      {label}
+    </label>
+    {rightIcon && <div className="absolute right-3 top-1/2 -translate-y-1/2">{rightIcon}</div>}
+    {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
+  </div>
+));
+FloatingLabelInput.displayName = 'FloatingLabelInput';
 
 export function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const registerMutation = useRegister()
-  
-  // Focus states untuk floating labels
-  const [firstNameFocused, setFirstNameFocused] = useState(false)
-  const [lastNameFocused, setLastNameFocused] = useState(false)
-  const [phoneNumberFocused, setPhoneNumberFocused] = useState(false)
-  const [countryFocused, setCountryFocused] = useState(false)
-  const [mailAddressFocused, setMailAddressFocused] = useState(false)
-  const [passwordFocused, setPasswordFocused] = useState(false)
-  const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false)
-  const [aboutFocused, setAboutFocused] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const registerMutation = useRegister();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
-    setValue
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      phoneCode: '+62',
-      phoneNumber: '',
-      country: '',
-      mailAddress: '',
-      password: '',
-      confirmPassword: '',
-      about: ''
-    }
-  })
+    defaultValues: { phoneCode: '+62' }
+  });
 
-  // Watch values untuk floating label logic
-  const firstNameValue = watch('firstName')
-  const lastNameValue = watch('lastName')
-  const phoneNumberValue = watch('phoneNumber')
-  const countryValue = watch('country')
-  const mailAddressValue = watch('mailAddress')
-  const passwordValue = watch('password')
-  const confirmPasswordValue = watch('confirmPassword')
-  const aboutValue = watch('about')
-  const phoneCodeValue = watch('phoneCode')
-
-  const onSubmit = async (data: RegisterFormData) => {
-    // Pengguna dapat mengisi semua field, namun API hanya membutuhkan firstName, lastName, email, dan password
-    // Field phoneNumber, country, dan about akan diabaikan oleh API
-    await registerMutation.mutateAsync(data)
-  }
+  const onSubmit = (data: RegisterFormData) => {
+    registerMutation.mutate(data);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* First Name & Last Name */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* First Name */}
-            <div className="relative">
-              <input
-                id="firstName"
-                type="text"
-                {...register('firstName')}
-                onFocus={() => setFirstNameFocused(true)}
-                onBlur={() => setFirstNameFocused(false)}
-                className={`
-                  w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
-                  focus:outline-none focus:ring-0
-                  ${errors.firstName 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : firstNameFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <label
-                htmlFor="firstName"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${firstNameFocused || firstNameValue
-                    ? `-top-2 text-xs font-medium ${errors.firstName ? 'text-red-500' : firstNameFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                First Name
-              </label>
-              {errors.firstName && (
-                <p className="mt-1 text-xs text-red-500">{errors.firstName.message}</p>
-              )}
-            </div>
+      {/* Row 1: First Name & Last Name */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FloatingLabelInput
+          id="firstName"
+          label="First Name"
+          type="text"
+          registration={register('firstName')}
+          error={errors.firstName?.message}
+        />
+        <FloatingLabelInput
+          id="lastName"
+          label="Last Name"
+          type="text"
+          registration={register('lastName')}
+          error={errors.lastName?.message}
+        />
+      </div>
 
-            {/* Last Name */}
-            <div className="relative">
-              <input
-                id="lastName"
-                type="text"
-                {...register('lastName')}
-                onFocus={() => setLastNameFocused(true)}
-                onBlur={() => setLastNameFocused(false)}
-                className={`
-                  w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
-                  focus:outline-none focus:ring-0
-                  ${errors.lastName 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : lastNameFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <label
-                htmlFor="lastName"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${lastNameFocused || lastNameValue
-                    ? `-top-2 text-xs font-medium ${errors.lastName ? 'text-red-500' : lastNameFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                Last Name
-              </label>
-              {errors.lastName && (
-                <p className="mt-1 text-xs text-red-500">{errors.lastName.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Phone Number & Country */}
-          <div className="grid grid-cols-12 gap-3">
-            {/* Phone Code */}
-            <div className="col-span-3 relative">
-              <select
-                {...register('phoneCode')}
-                className="w-full px-2 py-3 text-sm border-2 border-blue-500 rounded-lg bg-white text-blue-500 font-semibold focus:outline-none focus:ring-0 appearance-none"
-              >
-                {phoneCodes.map((code) => (
-                  <option key={code.value} value={code.value}>
-                    {code.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 pointer-events-none" />
-            </div>
-
-            {/* Phone Number */}
-            <div className="col-span-5 relative">
-              <input
-                id="phoneNumber"
-                type="text"
-                {...register('phoneNumber')}
-                onFocus={() => setPhoneNumberFocused(true)}
-                onBlur={() => setPhoneNumberFocused(false)}
-                className={`
-                  w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
-                  focus:outline-none focus:ring-0
-                  ${errors.phoneNumber 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : phoneNumberFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <label
-                htmlFor="phoneNumber"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${phoneNumberFocused || phoneNumberValue
-                    ? `-top-2 text-xs font-medium ${errors.phoneNumber ? 'text-red-500' : phoneNumberFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                Phone Number (Optional)
-              </label>
-              {errors.phoneNumber && (
-                <p className="mt-1 text-xs text-red-500">{errors.phoneNumber.message}</p>
-              )}
-            </div>
-
-            {/* Country */}
-            <div className="col-span-4 relative">
-              <select
+      {/* Row 2: Phone & Country */}
+      <div className="grid grid-cols-12 gap-x-3">
+        <div className="col-span-3 relative">
+          <select {...register('phoneCode')} className="w-full px-2 py-3 text-sm border-2 border-blue-500 rounded-lg bg-white text-blue-500 font-semibold focus:outline-none focus:ring-0 appearance-none">
+            <option>+62</option>
+            <option>+65</option>
+            <option>+1</option>
+          </select>
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500 pointer-events-none" />
+        </div>
+        <div className="col-span-5">
+            <FloatingLabelInput
+              id="phoneNumber"
+              label="Phone Number"
+              type="tel"
+              registration={register('phoneNumber')}
+              error={errors.phoneNumber?.message}
+            />
+        </div>
+        <div className="col-span-4 relative">
+            <select 
                 id="country"
                 {...register('country')}
-                onFocus={() => setCountryFocused(true)}
-                onBlur={() => setCountryFocused(false)}
-                className={`
-                  w-full px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white appearance-none
-                  focus:outline-none focus:ring-0
-                  ${errors.country 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : countryFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-              >
-                <option value="">Select</option>
-                {countries.map((country) => (
-                  <option key={country.value} value={country.value}>
-                    {country.label}
-                  </option>
-                ))}
-              </select>
-              <label
-                htmlFor="country"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${countryFocused || countryValue
-                    ? `-top-2 text-xs font-medium ${errors.country ? 'text-red-500' : countryFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                Country (Optional)
-              </label>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-              {errors.country && (
-                <p className="mt-1 text-xs text-red-500">{errors.country.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Mail Address */}
-          <div className="relative">
-            <div className="flex">
-              <input
-                id="mailAddress"
-                type="text"
-                {...register('mailAddress')}
-                onFocus={() => setMailAddressFocused(true)}
-                onBlur={() => setMailAddressFocused(false)}
-                className={`
-                  flex-1 px-3 py-3 text-sm transition-all duration-200 
-                  border-2 rounded-l-lg bg-white
-                  focus:outline-none focus:ring-0
-                  ${errors.mailAddress 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : mailAddressFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <div className="px-3 py-3 bg-gray-50 border-2 border-l-0 border-gray-300 rounded-r-lg text-sm text-gray-600">
-                @squareteam.com
-              </div>
-            </div>
-            <label
-              htmlFor="mailAddress"
-              className={`
-                absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                bg-white text-sm
-                ${mailAddressFocused || mailAddressValue
-                  ? `-top-2 text-xs font-medium ${errors.mailAddress ? 'text-red-500' : mailAddressFocused ? 'text-blue-500' : 'text-gray-600'}`
-                  : `top-3 text-gray-400`
-                }
-              `}
-            >
-              Mail Address
-            </label>
-            {errors.mailAddress && (
-              <p className="mt-1 text-xs text-red-500">{errors.mailAddress.message}</p>
-            )}
-          </div>
-
-          {/* Password & Confirm Password */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Password */}
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                {...register('password')}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
-                autoComplete="new-password"
-                style={{
-                  WebkitAppearance: 'none'
-                } as React.CSSProperties}
-                className={`
-                  w-full px-3 py-3 pr-10 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
-                  focus:outline-none focus:ring-0
-                  [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden
-                  ${errors.password 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : passwordFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <label
-                htmlFor="password"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${passwordFocused || passwordValue
-                    ? `-top-2 text-xs font-medium ${errors.password ? 'text-red-500' : passwordFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
+                className={cn(
+                    "peer w-full px-3 py-3 text-sm transition-all duration-200 border-2 rounded-lg bg-white appearance-none focus:outline-none focus:ring-0 placeholder-transparent",
+                    errors.country ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 hover:border-gray-400'
                 )}
-              </button>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div className="relative">
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                {...register('confirmPassword')}
-                onFocus={() => setConfirmPasswordFocused(true)}
-                onBlur={() => setConfirmPasswordFocused(false)}
-                autoComplete="new-password"
-                style={{
-                  WebkitAppearance: 'none'
-                } as React.CSSProperties}
-                className={`
-                  w-full px-3 py-3 pr-10 text-sm transition-all duration-200 
-                  border-2 rounded-lg bg-white
-                  focus:outline-none focus:ring-0
-                  [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden
-                  ${errors.confirmPassword 
-                    ? 'border-red-400 focus:border-red-500' 
-                    : confirmPasswordFocused 
-                      ? 'border-blue-500' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }
-                `}
-                placeholder=""
-              />
-              <label
-                htmlFor="confirmPassword"
-                className={`
-                  absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                  bg-white text-sm
-                  ${confirmPasswordFocused || confirmPasswordValue
-                    ? `-top-2 text-xs font-medium ${errors.confirmPassword ? 'text-red-500' : confirmPasswordFocused ? 'text-blue-500' : 'text-gray-600'}`
-                    : `top-3 text-gray-400`
-                  }
-                `}
-              >
-                Confirm Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* About Textarea */}
-          <div className="relative">
-            <textarea
-              id="about"
-              {...register('about')}
-              onFocus={() => setAboutFocused(true)}
-              onBlur={() => setAboutFocused(false)}
-              rows={4}
-              className={`
-                w-full px-3 py-3 text-sm transition-all duration-200 
-                border-2 rounded-lg bg-white resize-none
-                focus:outline-none focus:ring-0
-                ${aboutFocused 
-                  ? 'border-blue-500' 
-                  : 'border-gray-300 hover:border-gray-400'
-                }
-              `}
-              placeholder=""
-            />
-            <label
-              htmlFor="about"
-              className={`
-                absolute left-2 px-1 transition-all duration-200 pointer-events-none
-                bg-white text-sm
-                ${aboutFocused || aboutValue
-                  ? `-top-2 text-xs font-medium ${aboutFocused ? 'text-blue-500' : 'text-gray-600'}`
-                  : `top-3 text-gray-400`
-                }
-              `}
             >
-              Tell us about yourself (Optional)
-            </label>
-          </div>
+                <option value="" disabled selected></option>
+                <option value="indonesia">Indonesia</option>
+                <option value="singapore">Singapore</option>
+                <option value="usa">USA</option>
+            </select>
+            <label htmlFor="country" className={cn(
+                "absolute left-2 -top-2.5 px-1 bg-white text-xs font-medium transition-all duration-200 pointer-events-none",
+                "peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400",
+                "peer-focus:-top-2.5 peer-focus:text-xs peer-focus:font-medium",
+                errors.country ? "text-red-500 peer-focus:text-red-500" : "text-gray-500 peer-focus:text-blue-500"
+            )}>Your Country</label>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        </div>
+      </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 mt-8">
-            <Link
-              href="/login"
-              className="flex-1 bg-[#f0f1f5] text-gray-600 font-poppins font-semibold py-3 rounded-lg text-center hover:bg-gray-200 transition-colors"
-            >
-              Login
-            </Link>
-            <button
-              type="submit"
-              disabled={isSubmitting || registerMutation.isPending}
-              className={`
-                flex-1 py-3 text-white font-poppins font-semibold rounded-lg
-                transition-all duration-200 
-                ${isSubmitting || registerMutation.isPending
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-[#0066ff] hover:bg-[#0051cc] active:bg-[#003d99] hover:shadow-lg'
-                }
-              `}
-            >
-              {isSubmitting || registerMutation.isPending ? 'Loading...' : 'Register'}
+{/* Row 3: Mail Address */}
+<div className="flex w-full">
+  <div className="flex-1">
+    <FloatingLabelInput
+      id="mailAddress"
+      label="Mail Address"
+      type="text"
+      className="h-[50px] rounded-r-none border-r-0 focus:border-blue-500"
+      registration={register('mailAddress')}
+      error={errors.mailAddress?.message}
+    />
+  </div>
+
+  <span
+    className="inline-flex items-center justify-center h-[50px] px-4 text-sm text-gray-500 bg-gray-50 border-2 border-l-0 border-gray-300 rounded-r-lg flex-shrink-0"
+  >
+    @squareteam.com
+  </span>
+</div>
+
+
+      {/* Row 4: Passwords */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FloatingLabelInput
+          id="password"
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          registration={register('password')}
+          error={errors.password?.message}
+          rightIcon={
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-gray-400 hover:text-gray-600">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
-          </div>
+          }
+        />
+        <FloatingLabelInput
+          id="confirmPassword"
+          label="Confirm Password"
+          type={showConfirmPassword ? 'text' : 'password'}
+          registration={register('confirmPassword')}
+          error={errors.confirmPassword?.message}
+          rightIcon={
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-gray-400 hover:text-gray-600">
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+        />
+      </div>
+
+      {/* Row 5: Textarea */}
+      <div className="relative">
+        <textarea
+          id="about"
+          rows={3}
+          className="peer w-full px-3 py-3 text-sm transition-all duration-200 border-2 rounded-lg bg-white resize-none focus:outline-none focus:ring-0 placeholder-transparent"
+          placeholder="Tell us about yourself (Optional)"
+          {...register('about')}
+        />
+        <label
+          htmlFor="about"
+          className="absolute left-2 -top-2.5 px-1 bg-white text-xs font-medium text-gray-500 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:font-medium peer-focus:text-blue-500"
+        >
+          Tell us about yourself (Optional)
+        </label>
+      </div>
+
+      {/* Row 6: Action Buttons */}
+      <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
+        <button
+          type="button"
+          className="w-full sm:w-2/5 bg-[#f0f1f5] text-gray-600 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          Login
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting || registerMutation.isPending}
+          className="w-full sm:w-3/5 bg-[#0066ff] text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          {isSubmitting || registerMutation.isPending ? 'Registering...' : 'Register'}
+        </button>
+      </div>
     </form>
-  )
+  );
 }

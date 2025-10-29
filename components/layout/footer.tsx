@@ -1,21 +1,10 @@
-// Footer component - dibuat sama Rifqi buat nunjukin credit
-// Pake font Roboto biar keliatan professional
-import { cn } from '@/lib/utils'
+// components/layout/footer.tsx
+import React from 'react'
 
-interface FooterProps {
-  className?: string // props optional buat custom styling
-}
-
-export function Footer({ className }: FooterProps) {
+export function Footer() {
   return (
-    <footer className={cn(
-      "mt-auto py-6 bg-white border-t border-gray-200 text-center w-full", // styling default footer
-      className // merge sama custom class kalo ada
-    )}>
-      {/* Text copyright dengan nama gua */}
-      <p className="text-sm text-gray-600 font-roboto">
-        © RifqiHaikal-2025
-      </p>
+    <footer className="fixed bottom-0 left-0 w-full p-2 text-center text-gray-800 bg-white/30 backdrop-blur-md border-t border-gray-200/60 shadow-md z-50">
+      Rifqi Haikal @2025
     </footer>
   )
 }
