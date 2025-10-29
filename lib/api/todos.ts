@@ -233,7 +233,9 @@ export async function deleteTodo(id: string): Promise<void> {
  * API untuk bulk delete todos
  */
 export async function bulkDeleteTodos(ids: string[]): Promise<void> {
-  await apiClient.post('/todos/bulk-delete', { ids })
+  // API tidak support bulk delete, jadi kita kirim request satu per satu
+  // Promise.all untuk menjalankan semua request secara paralel
+  await Promise.all(ids.map(id => deleteTodo(id)))
 }
 
 /**
