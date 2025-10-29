@@ -157,9 +157,6 @@ export function useDeleteTodo() {
       // Gak rollback - biar todo tetep kehapus dari UI
       // User gak perlu tau kalo API nya error, yang penting UX smooth
       toast.success('Todo berhasil dihapus')
-      
-      // Log error buat debugging doang
-      console.log('Delete API failed but todo removed from UI:', error)
     },
   })
 }
@@ -203,9 +200,6 @@ export function useBulkDeleteTodos() {
       // Jangan rollback, biarkan todos tetap terhapus dari UI
       // Hanya tampilkan toast bahwa todos sudah dihapus
       toast.success('Todo terpilih berhasil dihapus')
-      
-      // Optional: Log error for debugging tanpa mengganggu user
-      console.log('Bulk delete API failed but todos removed from UI:', error)
     },
   })
 }

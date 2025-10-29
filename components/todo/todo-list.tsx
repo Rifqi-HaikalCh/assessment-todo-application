@@ -39,11 +39,7 @@ export function TodoList({ todos, showSelection = false }: TodoListProps) {
   }
 
   if (todos.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        <p>Belum ada todo. Tambahkan todo baru!</p>
-      </div>
-    )
+    return null
   }
 
   return (
