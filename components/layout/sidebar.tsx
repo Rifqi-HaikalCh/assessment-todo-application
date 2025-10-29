@@ -20,12 +20,6 @@ export function Sidebar() {
       icon: Home,
       show: true,
     },
-    {
-      label: 'Admin',
-      href: '/admin',
-      icon: Users,
-      show: isAdmin,
-    },
   ]
 
   return (

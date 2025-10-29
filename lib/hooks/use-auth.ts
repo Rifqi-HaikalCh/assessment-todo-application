@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { useTransitionStore } from '@/lib/store/transition.store'
 import { login, register, verifyToken } from '@/lib/api/auth'
-import { LoginInput, RegisterInput } from '@/lib/schemas/auth.schema'
+import { LoginInput, RegisterInput, LoginResponse } from '@/lib/schemas/auth.schema'
 import { getErrorMessage } from '@/lib/api/client'
 
 /**
@@ -14,30 +14,43 @@ export function useLogin() {
   const router = useRouter()
   const { login: setAuth } = useAuthStore()
   const { showTransition, hideTransition } = useTransitionStore()
-  
-  return useMutation({
-    mutationFn: (data: LoginInput) => login(data),
-    onSuccess: (response) => {
-      if (response.success && response.data) {
-        // Simpan auth data ke store
-        setAuth(response.data.user, response.data.token)
-        
-        // Tampilkan animasi transisi
-        showTransition()
-        
-        // Tunggu animasi, lalu redirect dan sembunyikan transisi
-        setTimeout(() => {
-          const destination = response.data.user.role === 'admin' ? '/admin' : '/todo';
-          router.push(destination);
-          
-          // Sembunyikan overlay setelah navigasi dimulai
-          hideTransition();
-          toast.success('Login berhasil!');
 
-        }, 2000) // Durasi untuk melihat animasi
+  return useMutation({
+    mutationFn: (data: LoginInput): Promise<LoginResponse> => login(data), // Tambahkan tipe Promise<LoginResponse>
+    onSuccess: (response: LoginResponse) => { // Tambahkan tipe LoginResponse pada response
+      // Periksa apakah response sukses DAN memiliki data
+      if (response.success && response.data) {
+        // Karena kita sudah cek response.data, TypeScript sekarang tahu itu ada
+        const { user, token } = response.data; 
+        
+        // Simpan auth data ke store
+        setAuth(user, token)
+
+        // Tampilkan animasi transisi (splash screen)
+        showTransition()
+
+        // Durasi splash screen terlihat (misalnya 2 detik)
+        const splashDuration = 2000;
+        // Durasi fade-out (sesuaikan dengan CSS di LoginTransition, misal 500ms)
+        const fadeOutDuration = 500;
+
+        // Tampilkan splash screen selama 'splashDuration'
+        setTimeout(() => {
+          // Mulai sembunyikan (trigger fade-out)
+          hideTransition();
+
+          // Tunggu fade-out selesai, baru redirect
+          setTimeout(() => {
+            const destination = user.role === 'admin' ? '/admin' : '/todo'; // Gunakan user dari variabel
+            router.push(destination);
+            toast.success('Login berhasil!');
+          }, fadeOutDuration);
+
+        }, splashDuration);
 
       } else {
-        toast.error(response.message || 'Login gagal')
+        // Jika sukses tapi tidak ada data (seharusnya tidak terjadi berdasarkan API), atau jika tidak sukses
+        toast.error(response.message || 'Login gagal: Data tidak ditemukan setelah sukses login.')
       }
     },
     onError: (error) => {
@@ -45,7 +58,6 @@ export function useLogin() {
     },
   })
 }
-
 /**
  * Hook untuk register
  */
