@@ -1,5 +1,3 @@
-// API client buat todos - ini yang handle semua komunikasi sama backend
-// Gua bikin dengan error handling yang proper dan data transformation
 import apiClient from './client'
 import {
   Todo,
@@ -13,17 +11,11 @@ import {
   todoResponseSchema,
 } from '@/lib/schemas/todo.schema'
 
-/**
- * Get semua todos - ini function yang paling sering dipanggil
- * Udah include data transformation biar response konsisten
- */
 export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
   const response = await apiClient.get('/todos')
   
-  // Transform API response to match our schema
   const apiResponse = response.data
   
-  // Handle different API response structures
   let todosArray = []
   if (apiResponse.content?.entries) {
     todosArray = apiResponse.content.entries
@@ -33,14 +25,11 @@ export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
     todosArray = apiResponse
   }
   
-  // Transform todos to match our schema - HANYA data yang valid dari API
   const transformedTodos = todosArray
     .filter((todo: any) => {
-      // HANYA terima todo yang memiliki ID dan title yang valid
       const hasValidId = todo.id || todo._id || todo.uuid
       const hasValidTitle = todo.item || todo.title
       
-      // Log warning jika ada data tidak valid (untuk debugging)
       if (!hasValidId || !hasValidTitle) {
         console.warn('⚠️ Skipping invalid todo from API:', {
           todo,
@@ -53,7 +42,6 @@ export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
     })
     .map((todo: any) => {
       const transformedTodo = {
-        // HANYA gunakan ID yang benar-benar ada dari API
         id: todo.id || todo._id || todo.uuid,
         title: todo.item || todo.title,
         completed: todo.isDone || todo.completed || false,
@@ -81,42 +69,31 @@ export async function getTodos(filter?: TodoFilter): Promise<TodoListResponse> {
   return todoListResponseSchema.parse(transformedResponse)
 }
 
-/**
- * API untuk mengambil single todo
- */
 export async function getTodo(id: string): Promise<TodoResponse> {
   const response = await apiClient.get(`/todos/${id}`)
   
-  // Validasi response dengan zod
   return todoResponseSchema.parse(response.data)
 }
 
-/**
- * Bikin todo baru - function ini lumayan kompleks karena harus handle
- * berbagai format response dari API yang gak konsisten
- */
 export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
   try {
     const response = await apiClient.post('/todos', {
-      item: data.title // API expect 'item', bukan 'title'
+      item: data.title
     })
     
-    // Transform response - API nya kadang beda-beda format responnya
     const apiResponse = response.data
     
-    // Handle different response structures - defensive programming nih
     let todoData
     if (apiResponse?.content) {
-      todoData = apiResponse.content // format { content: { ... } }
+      todoData = apiResponse.content
     } else if (apiResponse?.data) {
-      todoData = apiResponse.data // format { data: { ... } }
+      todoData = apiResponse.data
     } else if (apiResponse) {
-      todoData = apiResponse // direct object
+      todoData = apiResponse 
     } else {
-      todoData = {} // fallback kalo kosong
+      todoData = {}
     }
     
-    // Validasi ID - ini penting banget biar gak error di UI
     const apiId = todoData?.id || todoData?._id || todoData?.uuid
     
     if (!apiId) {
@@ -124,9 +101,8 @@ export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
       throw new Error('API Error: Todo berhasil dibuat tapi server gak return ID yang valid')
     }
     
-    // Transform biar match sama schema kita
     const transformedTodo = {
-      id: apiId, // pake ID dari API aja
+      id: apiId,
       title: todoData?.item || todoData?.title || data.title,
       completed: todoData?.isDone || todoData?.completed || false,
       userId: todoData?.userId || 'unknown',
@@ -148,44 +124,31 @@ export async function createTodo(data: CreateTodoInput): Promise<TodoResponse> {
   }
 }
 
-/**
- * API untuk update todo
- */
 export async function updateTodo(
   id: string,
   data: UpdateTodoInput
 ): Promise<TodoResponse> {
   const response = await apiClient.put(`/todos/${id}`, data)
   
-  // Validasi response dengan zod
   return todoResponseSchema.parse(response.data)
 }
 
-/**
- * API untuk toggle status todo (mark as complete/incomplete)
- */
 export async function toggleTodo(id: string, action: 'DONE' | 'UNDONE' = 'DONE'): Promise<TodoResponse> {
   const response = await apiClient.put(`/todos/${id}/mark`, {
     action
   })
   
-  // Transform API response to match our schema
   const apiResponse = response.data
   
-  // The API might return different structures, let's handle them
   let todoData
   if (apiResponse.content) {
-    // If API returns { content: { ... } }
     todoData = apiResponse.content
   } else if (apiResponse.data) {
-    // If API returns { data: { ... } }
     todoData = apiResponse.data
   } else {
-    // If API returns the todo object directly
     todoData = apiResponse
   }
   
-  // Transform to match our schema
   const transformedTodo = {
     id: todoData.id || todoData._id || id,
     title: todoData.item || todoData.title || 'Todo Item',
@@ -205,11 +168,7 @@ export async function toggleTodo(id: string, action: 'DONE' | 'UNDONE' = 'DONE')
   return todoResponseSchema.parse(transformedResponse)
 }
 
-/**
- * API untuk hapus todo
- */
 export async function deleteTodo(id: string): Promise<void> {
-  // Validasi ID sebelum mengirim request
   if (!id || id === 'undefined' || id.trim() === '') {
     throw new Error('Invalid todo ID: ID cannot be empty or undefined')
   }
@@ -218,7 +177,6 @@ export async function deleteTodo(id: string): Promise<void> {
     const response = await apiClient.delete(`/todos/${id}`)
     return response.data
   } catch (error: any) {
-    // Log error untuk debugging tanpa spam console
     if (error?.response?.status === 404) {
       console.error(`❌ Todo dengan ID '${id}' tidak ditemukan di server. Kemungkinan todo sudah dihapus atau ID tidak valid.`)
       throw new Error(`Todo tidak ditemukan. ID '${id}' mungkin sudah tidak valid.`)
@@ -229,18 +187,10 @@ export async function deleteTodo(id: string): Promise<void> {
   }
 }
 
-/**
- * API untuk bulk delete todos
- */
 export async function bulkDeleteTodos(ids: string[]): Promise<void> {
-  // API tidak support bulk delete, jadi kita kirim request satu per satu
-  // Promise.all untuk menjalankan semua request secara paralel
   await Promise.all(ids.map(id => deleteTodo(id)))
 }
 
-/**
- * API untuk bulk action todos
- */
 export async function bulkActionTodos(data: BulkAction): Promise<void> {
   await apiClient.post('/todos/bulk-action', data)
 }

@@ -8,7 +8,6 @@ import { Eye, EyeOff, ChevronDown } from 'lucide-react'
 import { useRegister } from '@/lib/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
-// Zod schema for validation
 const registerSchema = z.object({
   firstName: z.string().min(1, 'First Name is required'),
   lastName: z.string().min(1, 'Last Name is required'),
@@ -26,7 +25,6 @@ const registerSchema = z.object({
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-// Reusable Floating Label Input Component
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;

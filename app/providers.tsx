@@ -9,7 +9,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const syncTokenToCookie = useAuthStore((state) => state.syncTokenToCookie)
   
   useEffect(() => {
-    // Sync token to cookie on app initialization
     syncTokenToCookie()
   }, [syncTokenToCookie])
   
@@ -17,20 +16,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // Membuat QueryClient instance dengan konfigurasi default
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            // Konfigurasi default untuk semua query
-            staleTime: 60 * 1000, // 1 menit
-            gcTime: 5 * 60 * 1000, // 5 menit (sebelumnya cacheTime)
+            staleTime: 60 * 1000,
+            gcTime: 5 * 60 * 1000,
             retry: 1,
             refetchOnWindowFocus: false,
           },
           mutations: {
-            // Konfigurasi default untuk semua mutation
             retry: 1,
           },
         },

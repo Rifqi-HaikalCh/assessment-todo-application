@@ -1,6 +1,3 @@
-// Tailwind config yang udah gua customize buat project ini
-// Tambahan font family, colors, sama animations yang dibutuhin
-// Rifqi Haikal - 2025
 import type { Config } from "tailwindcss"
 
 const config = {

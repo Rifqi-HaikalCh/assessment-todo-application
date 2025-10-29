@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-/**
- * API Proxy Route
- * Digunakan untuk mengatasi CORS issues jika diperlukan
- * Route ini akan meneruskan request ke API eksternal
- */
-
 const API_BASE_URL = 'https://fe-test-api.nwappservice.com'
 
 export async function GET(
@@ -21,7 +15,6 @@ export async function GET(
     const response = await fetch(apiUrl, {
       headers: {
         'Content-Type': 'application/json',
-        // Forward authorization header jika ada
         ...(request.headers.get('Authorization') && {
           Authorization: request.headers.get('Authorization')!,
         }),
@@ -54,7 +47,6 @@ export async function POST(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // Forward authorization header jika ada
         ...(request.headers.get('Authorization') && {
           Authorization: request.headers.get('Authorization')!,
         }),
@@ -88,7 +80,6 @@ export async function PUT(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        // Forward authorization header jika ada
         ...(request.headers.get('Authorization') && {
           Authorization: request.headers.get('Authorization')!,
         }),
@@ -120,7 +111,6 @@ export async function DELETE(
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        // Forward authorization header jika ada
         ...(request.headers.get('Authorization') && {
           Authorization: request.headers.get('Authorization')!,
         }),

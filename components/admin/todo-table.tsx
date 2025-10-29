@@ -12,39 +12,24 @@ interface TodoTableProps {
   isLoading?: boolean
 }
 
-/**
- * Komponen Tabel untuk menampilkan todos
- * Mengikuti desain dari HTML template
- */
 export function TodoTable({ todos, isLoading }: TodoTableProps) {
   const toggleMutation = useToggleAdminTodo()
   const deleteMutation = useDeleteAdminTodo()
-  
-  /**
-   * Handler untuk toggle status todo
-   */
+
   const handleToggle = (id: string, currentStatus: boolean) => {
     toggleMutation.mutate({ id, isDone: currentStatus })
   }
-  
-  /**
-   * Handler untuk hapus todo
-   */
+
   const handleDelete = (id: string) => {
     if (confirm('Apakah Anda yakin ingin menghapus todo ini?')) {
       deleteMutation.mutate(id)
     }
   }
-  
-  /**
-   * Format nama user dari data
-   * Menggunakan fullName jika ada, atau generate dari userId
-   */
+
   const formatUserName = (todo: AdminTodo) => {
     if (todo.user?.fullName) {
       return todo.user.fullName
     }
-    // Fallback: gunakan userId yang dipotong
     return `User ${todo.userId.slice(0, 8)}`
   }
   

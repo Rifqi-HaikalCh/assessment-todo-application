@@ -1,4 +1,3 @@
-// components/layout/footer.tsx
 import React from 'react'
 
 export function Footer() {

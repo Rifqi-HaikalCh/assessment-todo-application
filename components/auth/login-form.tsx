@@ -1,5 +1,3 @@
-// Form login yang udah gua bikin dengan floating labels
-// Pake react-hook-form buat validasi yang smooth
 'use client'
 
 import { useState } from 'react'
@@ -16,14 +14,12 @@ import { useLogin } from '@/lib/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 export function LoginForm() {
-  // State buat kontrol tampilan password sama focus effect
   const [showPassword, setShowPassword] = useState(false)
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const loginMutation = useLogin()
   
-  // Setup form dengan validasi schema
   const {
     register,
     handleSubmit,
@@ -31,7 +27,7 @@ export function LoginForm() {
     setValue,
     watch,
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema), // validasi pake zod schema
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -39,12 +35,10 @@ export function LoginForm() {
     },
   })
 
-  // Watch values buat floating label animation
   const rememberMe = watch('rememberMe')
   const emailValue = watch('email')
   const passwordValue = watch('password')
 
-  // Submit handler - panggil mutation hook
   const onSubmit = async (data: LoginInput) => {
     await loginMutation.mutateAsync(data)
   }

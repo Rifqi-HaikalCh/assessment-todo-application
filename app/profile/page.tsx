@@ -28,13 +28,11 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#dedede] flex flex-col font-inter">
-      {/* Main Content - Responsive */}
       <main className="flex-1 flex justify-center py-12 lg:py-20 px-4 lg:px-6">
         <section 
           className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 lg:p-8 h-fit"
           style={{ boxShadow: "10px 10px 20px rgba(0,0,0,0.1)" }}
         >
-          {/* Back Button */}
           <div className="mb-6">
             <Link
               href={user.role === 'admin' ? '/admin' : '/todo'}
@@ -45,10 +43,8 @@ export default function ProfilePage() {
             </Link>
           </div>
 
-          {/* Profile Card - Responsive */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-4 lg:p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
-              {/* Avatar */}
               <div className="relative flex-shrink-0">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl lg:text-2xl font-bold">
                   {getInitials(user.name)}
@@ -59,15 +55,12 @@ export default function ProfilePage() {
                 />
               </div>
               
-              {/* User Info */}
               <div className="flex-1">
                 <h2 className="text-xl lg:text-2xl font-bold text-gray-800">{user.name}</h2>
                 <p className="text-gray-600 capitalize text-sm lg:text-base">{user.role} Account</p>
               </div>
             </div>
           </div>
-
-          {/* User Details */}
           <div className="space-y-4 mb-8">
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center space-x-3">
@@ -107,7 +100,6 @@ export default function ProfilePage() {
 
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href={user.role === 'admin' ? '/admin' : '/todo'} className="flex-1">
               <Button 
@@ -131,8 +123,6 @@ export default function ProfilePage() {
         </section>
       </main>
       
-      {/* Footer */}
-      <Footer />
     </div>
   )
 }

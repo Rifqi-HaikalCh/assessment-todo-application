@@ -1,4 +1,3 @@
-// components/admin/pagination.tsx
 'use client'
 
 import React from 'react'
@@ -11,38 +10,26 @@ interface PaginationProps {
   onPageChange: (page: number) => void
 }
 
-/**
- * Komponen Pagination untuk navigasi halaman
- * Mengikuti desain dari HTML template
- */
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  /**
-   * Generate array nomor halaman yang akan ditampilkan
-   * Maksimal 5 halaman ditampilkan
-   */
+
   const getPageNumbers = () => {
     const pages = []
     const maxVisible = 5
     
     if (totalPages <= maxVisible) {
-      // Jika total halaman <= 5, tampilkan semua
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i)
       }
     } else {
-      // Logic untuk menampilkan halaman dengan ellipsis
       if (currentPage <= 3) {
-        // Awal: 1 2 3 4 ... last
         for (let i = 1; i <= 4; i++) pages.push(i)
         pages.push('...')
         pages.push(totalPages)
       } else if (currentPage >= totalPages - 2) {
-        // Akhir: 1 ... last-3 last-2 last-1 last
         pages.push(1)
         pages.push('...')
         for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i)
       } else {
-        // Tengah: 1 ... current-1 current current+1 ... last
         pages.push(1)
         pages.push('...')
         pages.push(currentPage - 1)
@@ -56,7 +43,6 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
     return pages
   }
   
-  // Jika hanya 1 halaman atau tidak ada halaman, tidak perlu pagination
   if (totalPages <= 1) {
     return null
   }

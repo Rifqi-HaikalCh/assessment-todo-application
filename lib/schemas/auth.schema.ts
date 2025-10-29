@@ -1,8 +1,5 @@
 import { z } from 'zod'
 
-/**
- * Schema untuk validasi form login
- */
 export const loginSchema = z.object({
   email: z
     .string()
@@ -18,9 +15,6 @@ export const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 })
 
-/**
- * Schema untuk validasi form register
- */
 export const registerSchema = z.object({
   firstName: z
     .string()
@@ -56,9 +50,6 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 })
 
-/**
- * Schema untuk response login dari API
- */
 export const loginResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
@@ -73,9 +64,6 @@ export const loginResponseSchema = z.object({
   }).optional(),
 })
 
-/**
- * Schema untuk response register dari API
- */
 export const registerResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
@@ -90,9 +78,6 @@ export const registerResponseSchema = z.object({
   }).optional(),
 })
 
-/**
- * Schema untuk validasi token
- */
 export const tokenResponseSchema = z.object({
   valid: z.boolean(),
   user: z.object({
@@ -103,7 +88,6 @@ export const tokenResponseSchema = z.object({
   }).optional(),
 })
 
-// Type exports
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginResponse = z.infer<typeof loginResponseSchema>

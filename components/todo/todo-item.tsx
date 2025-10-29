@@ -1,4 +1,3 @@
-// components/todo/todo-item.tsx
 'use client'
 
 import { Checkbox } from '@/components/ui/checkbox'

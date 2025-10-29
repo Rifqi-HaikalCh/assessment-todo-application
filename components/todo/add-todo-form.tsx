@@ -1,4 +1,3 @@
-// components/todo/add-todo-form.tsx
 'use client'
 
 import { useForm } from 'react-hook-form'
@@ -12,18 +11,13 @@ import { getErrorMessage } from '@/lib/api/client'
 export function AddTodoForm() {
   const queryClient = useQueryClient()
   
-  // React Query mutation untuk membuat todo
   const createTodoMutation = useMutation({
     mutationFn: createTodo,
     onSuccess: (response) => {
       if (response.success) {
-        // Invalidate dan refetch todos query
         queryClient.invalidateQueries({ queryKey: ['todos'] })
-        
-        // Reset form
         reset()
         
-        // Tampilkan pesan sukses
         toast.success('Todo berhasil ditambahkan!')
       } else {
         toast.error(response.message || 'Gagal menambahkan todo')
@@ -50,7 +44,6 @@ export function AddTodoForm() {
     try {
       await createTodoMutation.mutateAsync(data)
     } catch (error) {
-      // Error sudah ditangani di onError mutation
       console.error('Error creating todo:', error)
     }
   }

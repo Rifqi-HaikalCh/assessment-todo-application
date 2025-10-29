@@ -1,4 +1,3 @@
-// components/admin/filter-bar.tsx
 'use client'
 
 import React from 'react'
@@ -10,34 +9,22 @@ interface FilterBarProps {
   onFilterChange: (filter: AdminFilter) => void
 }
 
-/**
- * Komponen Filter Bar untuk halaman admin
- * Berisi search input dan filter dropdown
- */
 export function FilterBar({ filter, onFilterChange }: FilterBarProps) {
   const [searchValue, setSearchValue] = React.useState(filter.search || '')
-  
-  /**
-   * Handler untuk submit search
-   * Bisa dari button atau enter key
-   */
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     onFilterChange({
       ...filter,
       search: searchValue,
-      page: 1, // Reset ke halaman 1 saat search
+      page: 1,
     })
   }
-  
-  /**
-   * Handler untuk perubahan filter status
-   */
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange({
       ...filter,
       status: e.target.value as 'all' | 'success' | 'pending',
-      page: 1, // Reset ke halaman 1 saat ganti filter
+      page: 1,
     })
   }
   

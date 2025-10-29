@@ -1,5 +1,3 @@
-// Halaman utama todo buat user biasa - ini main page nya
-// Udah include search functionality sama filter yang smooth
 'use client'
 
 import React, { useState } from 'react'
@@ -15,15 +13,10 @@ import { toast } from 'sonner'
 
 type FilterStatus = 'all' | 'completed' | 'pending'
 
-/**
- * Main todo page buat user biasa - design nya udah gua bikin responsive
- * Admin bakal auto redirect ke /admin, jadi aman
- */
 export default function TodoPage() {
-  // Ambil data user dari auth store
   const user = useAuthStore(state => state.user)
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
-  const { searchQuery } = useSearchStore() // search dari header
+  const { searchQuery } = useSearchStore()
   const { data: todosResponse, isLoading, error, refetch } = useTodos()
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
   const [isSpinning, setIsSpinning] = useState(false)
@@ -38,18 +31,15 @@ export default function TodoPage() {
     }, 2000)
   }
 
-  // Filter todos berdasarkan search query dan status - real time filtering nih
   const filteredTodos = React.useMemo(() => {
     let todos = todosResponse?.data || []
 
-    // 1. Filter berdasarkan status
     if (filterStatus === 'completed') {
       todos = todos.filter(todo => todo.completed)
     } else if (filterStatus === 'pending') {
       todos = todos.filter(todo => !todo.completed)
     }
 
-    // 2. Filter berdasarkan search query
     if (searchQuery.trim()) {
       todos = todos.filter(todo =>
         todo.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -59,19 +49,16 @@ export default function TodoPage() {
     return todos
   }, [todosResponse?.data, searchQuery, filterStatus])
 
-  // Cek auth sama role - biar user yang bener aja yang bisa masuk
   React.useEffect(() => {
     if (!isAuthenticated) {
-      redirect('/login') // belum login? tendang ke login
+      redirect('/login')
     }
 
-    // Admin redirect ke dashboard admin - biar gak campur aduk
     if (user && user.role === 'admin') {
       redirect('/admin')
     }
   }, [isAuthenticated, user])
 
-  // Loading state kalo user data belum ada
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f7f8fa]">
@@ -80,7 +67,6 @@ export default function TodoPage() {
     )
   }
 
-  // Double check - admin gak boleh lihat page ini
   if (user.role === 'admin') {
     return null
   }
@@ -120,7 +106,6 @@ export default function TodoPage() {
     return null;
   }
 
-  // Render komponen todo dengan design layout baru
   return (
     <div className="min-h-screen bg-gray-50">
       {/* FontAwesome CDN for icons */}

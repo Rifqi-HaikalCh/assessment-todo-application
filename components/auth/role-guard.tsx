@@ -11,10 +11,6 @@ interface RoleGuardProps {
   fallback?: React.ReactNode
 }
 
-/**
- * Component untuk mengontrol akses berdasarkan role
- * Akan redirect pengguna jika role tidak sesuai
- */
 export function RoleGuard({ 
   children, 
   allowedRoles, 
@@ -26,7 +22,6 @@ export function RoleGuard({
 
   useEffect(() => {
     if (user && !allowedRoles.includes(user.role)) {
-      // Redirect berdasarkan role
       if (user.role === 'admin' && redirectTo) {
         router.replace(redirectTo)
       } else if (user.role === 'admin') {
@@ -37,7 +32,6 @@ export function RoleGuard({
     }
   }, [user, allowedRoles, redirectTo, router])
 
-  // Jika user belum load
   if (!user) {
     return fallback || (
       <div className="min-h-screen flex items-center justify-center">
@@ -46,11 +40,9 @@ export function RoleGuard({
     )
   }
 
-  // Jika role tidak diizinkan
   if (!allowedRoles.includes(user.role)) {
     return fallback || null
   }
 
-  // Jika role sesuai, tampilkan children
   return <>{children}</>
 }

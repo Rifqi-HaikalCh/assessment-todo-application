@@ -1,4 +1,3 @@
-// lib/store/transition.store.ts
 import { create } from 'zustand'
 
 interface TransitionState {

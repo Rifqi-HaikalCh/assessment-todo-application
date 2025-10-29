@@ -11,7 +11,6 @@ export default function TodoError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error untuk debugging
     console.error(error)
   }, [error])
 

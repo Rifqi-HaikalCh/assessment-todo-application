@@ -1,8 +1,3 @@
-/*
- * Dashboard Layout - main layout buat user yang udah login
- * Dibuat sama Rifqi dengan responsive design yang mantap
- * Include sidebar, header, sama footer yang konsisten
- */
 'use client'
 
 import { Sidebar } from '@/components/layout/sidebar'
@@ -26,8 +21,8 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className={cn(
         "flex-1 flex flex-col transition-all duration-300 ease-in-out",
-        "lg:ml-0", // Desktop: no margin needed
-        isCollapsed ? "ml-0" : "ml-0" // Mobile: always full width, sidebar is overlay
+        "lg:ml-0",
+        isCollapsed ? "ml-0" : "ml-0"
       )}>
         {/* Header */}
         <Header showSearch />

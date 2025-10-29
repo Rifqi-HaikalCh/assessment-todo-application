@@ -1,9 +1,7 @@
-// Header component - main navigation di atas
-// Udah include search functionality (conditional) sama user dropdown
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { usePathname } from 'next/navigation' // <-- Import usePathname
+import { usePathname } from 'next/navigation'
 import { Search, Star, ChevronDown, User, LogOut } from 'lucide-react'
 import { useCurrentUser } from '@/lib/hooks/use-auth'
 import { useSearchStore } from '@/lib/store/search.store'
@@ -13,7 +11,7 @@ import { getInitials } from '@/lib/utils'
 import Link from 'next/link'
 
 interface HeaderProps {
-  showSearch?: boolean // Prop ini masih bisa berguna jika ingin force hide di tempat lain
+  showSearch?: boolean
 }
 
 export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
@@ -23,16 +21,12 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
   const { isCollapsed, toggleSidebar } = useSidebarStore()
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const pathname = usePathname() // <-- Dapatkan pathname saat ini
+  const pathname = usePathname()
 
-  // Tentukan apakah search bar harus ditampilkan
-  // Tampil jika initialShowSearch true DAN BUKAN di halaman admin
   const shouldShowSearch = initialShowSearch && !pathname.startsWith('/admin');
 
-  // Keyboard shortcut buat fokus ke search (Ctrl+/)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Hanya aktifkan shortcut jika search bar tampil
       if (shouldShowSearch && e.ctrlKey && e.key === '/') {
         e.preventDefault()
         const searchInput = document.getElementById('header-search')
@@ -42,9 +36,8 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [shouldShowSearch]) // Tambahkan shouldShowSearch sebagai dependency
+  }, [shouldShowSearch])
 
-  // Tutup dropdown kalo klik di luar area
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -56,7 +49,6 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Handler buat update search query
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
@@ -67,7 +59,7 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
         {/* Mobile menu button */}
         <button
           onClick={toggleSidebar}
-          className="lg:hidden p-2 -ml-2 mr-2 text-gray-500 hover:text-gray-700" // Adjust margin
+          className="lg:hidden p-2 -ml-2 mr-2 text-gray-500 hover:text-gray-700"
           aria-label="Toggle menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +72,7 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
           <div className="hidden sm:flex items-center relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             <input
-              id="header-search" // ID unik
+              id="header-search"
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
@@ -89,9 +81,7 @@ export function Header({ showSearch: initialShowSearch = false }: HeaderProps) {
             />
           </div>
         ) : (
-          // Placeholder atau elemen lain jika search tidak tampil (opsional)
-          // Bisa juga kosong jika tidak ingin ada apa-apa
-          <div className="hidden sm:block h-9"></div> // Placeholder seukuran input
+          <div className="hidden sm:block h-9"></div>
         )}
       </div>
 

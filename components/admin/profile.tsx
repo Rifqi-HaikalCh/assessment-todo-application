@@ -1,4 +1,3 @@
-// src/components/admin/profile.tsx
 'use client'
 
 import React from 'react'
@@ -6,17 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/lib/store/auth.store'
 import { useLogout } from '@/lib/hooks/use-auth'
 
-/**
- * Komponen Profile untuk Admin
- * Terpisah dari komponen user biasa dan menggunakan router.back()
- */
 export function AdminProfile() {
   const router = useRouter()
   const user = useAuthStore(state => state.user)
   const handleLogout = useLogout()
   const [showDropdown, setShowDropdown] = React.useState(false)
   
-  // Handle click outside to close dropdown
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
@@ -62,7 +56,7 @@ export function AdminProfile() {
           <button
             onClick={() => {
               setShowDropdown(false)
-              router.back() // Kembali ke halaman sebelumnya, bukan ke /todo
+              router.back() 
             }}
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
@@ -73,7 +67,7 @@ export function AdminProfile() {
           <button
             onClick={() => {
               setShowDropdown(false)
-              router.push('/admin/settings') // Link ke settings admin (jika ada)
+              router.push('/admin/settings')
             }}
             className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >

@@ -65,7 +65,6 @@ npm install
 2. **Environment Setup**
 ```bash
 cp .env.example .env.local
-# Edit .env.local jika diperlukan
 ```
 
 3. **Run Development**
